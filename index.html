@@ -14,53 +14,30 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<link rel="stylesheet" type="text/css" href="css/yidong.css" />
 	<script>document.addEventListener('visibilitychange',function(){if(document.visibilityState=='hidden'){normal_title=document.title;document.title='黄金比例';}else{document.title=normal_title;}});</script>
-<style>
-        #time {
-            font-size: 3em; /* 时间字体较大 */
-            color: #333;
-            margin-bottom: 10px; /* 时间和日期之间的间距 */
-        }
-        #date {
-            font-size: 1.2em; /* 日期字体较小 */
-            color: #666;
+    <style>
+        .time {
+            font-size: 2em;
+            color: transparent;
         }
     </style>
 </head>
 
 <body> 
-	<!-- 搜索栏start -->
-	
-	 <script>
+	<script>
         function updateTime() {
             const now = new Date();
+            const timeElement = document.querySelector('.time');
 
-            // 获取时间部分（时:分:秒）
-            const timeString = now.toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-
-            // 获取日期部分（年-月-日）
-            const dateString = now.toLocaleDateString('zh-CN', { 
-                year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit' 
-            });
-
-            // 更新时间
-            document.getElementById('time').textContent = timeString;
-
-            // 更新日期
-            document.getElementById('date').textContent = dateString;
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
         }
 
-        // 页面加载时立即更新时间
-        updateTime();
-
-        // 每秒更新一次时间
         setInterval(updateTime, 1000);
+        updateTime(); // Initial call to display immediately
     </script>
+	<!-- 搜索栏start -->
 	<div class="baidu baidu-2">
 		<div style="font-size:15px;color:#FFFFFF" align="center"><script src="https://www.jdzjw.com/one/api.php"></script></div></br>
 		<form name="f" action="https://www.google.com/search?q=" target="_blank">
