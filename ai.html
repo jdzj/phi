@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AINav</title>
+    <title>AINAV</title>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
     
     <style>
@@ -48,13 +48,13 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.4);
             padding: 30px 20px 20px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(2px);
             border-bottom: 1px solid rgba(255,255,255,0.5);
         }
 
@@ -387,7 +387,7 @@
 
 <div id="loginModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0;">管理员验证</h3>
+        <h3 style="margin-top:0;">管理验证</h3>
         <input type="password" id="adminPassword" class="form-input" placeholder="密码" style="margin: 20px 0; text-align: center;">
         <div style="display: flex; gap: 10px; justify-content: center;">
             <button class="btn btn-primary" style="flex: 1;" onclick="checkPassword()">登录</button>
@@ -400,22 +400,22 @@
     const ADMIN_PASSWORD = "618033";
     
     const defaultSites = [
-        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型", category: "置顶", status: "ok" },
+        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI开发的大语言模型", category: "置顶", status: "ok" },
         { name: "Gemini", url: "https://ai.google/", desc: "Google Ai", category: "置顶", status: "ok" },
-        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai", category: "置顶", status: "ok" },
-        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具", category: "置顶", status: "ok" },
-        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员", category: "置顶", status: "ok" },
-        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽", category: "置顶", status: "ok" },
-        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎", category: "置顶", status: "ok" },
+        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下Ai", category: "置顶", status: "ok" },
+        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的AI绘画生成工具", category: "置顶", status: "ok" },
+        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的AI结对程序员", category: "置顶", status: "ok" },
+        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI社区的枢纽", category: "置顶", status: "ok" },
+        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI驱动的搜索引擎", category: "置顶", status: "ok" },
         { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全 AI 助手", category: "置顶", status: "ok" },
         { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型", category: "置顶", status: "ok" },
-        { name: "通义千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶", status: "ok" },
-        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型", category: "置顶", status: "ok" },
+        { name: "千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶", status: "ok" },
+        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的大语言模型", category: "置顶", status: "ok" },
         { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型", category: "置顶", status: "ok" },
-        { name: "腾讯元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型", category: "置顶", status: "ok" },
-        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型", category: "置顶", status: "ok" },
-        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型", category: "置顶", status: "ok" },
-        { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成", category: "置顶", status: "ok" }
+        { name: "元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的大语言模型", category: "置顶", status: "ok" },
+        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的大语言模型", category: "置顶", status: "ok" },
+        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI视频生成模型", category: "置顶", status: "ok" },
+        { name: "Sunoo", url: "https://suno.com", desc: "AI音乐生成", category: "置顶", status: "ok" }
     ];
 
     let sites = [];
