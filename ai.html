@@ -10,6 +10,9 @@
     <meta name="keywords" content="AI,1.618033,AINav,Ai导航" />
     <meta name="description" content="Sex，life goes on。" />
     <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
+    <!-- 移除了可能不存在的外部 CSS，避免加载错误，全部使用内联样式 -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/style.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/yidong.css" /> -->
     
     <title>AINav</title>
 
@@ -191,4 +194,307 @@
         }
 
         .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-dan
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-secondary { background-color: #64748b; color: white; }
+        .btn-warning { background-color: #f59e0b; color: white; }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* 登录模态框 */
+        #loginModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        // 标题切换脚本
+        document.addEventListener('visibilitychange',function(){
+            if(document.visibilityState=='hidden'){
+                normal_title=document.title;
+                document.title='漫游中…';
+            }else{
+                document.title=normal_title;
+            }
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+    <header>
+        <h1>🚀 AI 网址导航</h1>
+        <p>精选全球最实用的 AI 工具与资源</p>
+        <input type="text" id="searchInput" class="search-box" placeholder="搜索工具名称或描述..." onkeyup="filterSites()">
+        <button class="admin-btn" onclick="showLogin()">⚙️ 管理入口</button>
+    </header>
+
+    <!-- 管理面板 (添加新网站) -->
+    <div id="adminPanel">
+        <h3>➕ 添加新网站</h3>
+        <div class="form-group">
+            <label>网站名称</label>
+            <input type="text" id="newName" class="form-control" placeholder="例如：ChatGPT">
+        </div>
+        <div class="form-group">
+            <label>网站链接 (URL)</label>
+            <input type="url" id="newUrl" class="form-control" placeholder="https://...">
+        </div>
+        <div class="form-group">
+            <label>简短描述</label>
+            <input type="text" id="newDesc" class="form-control" placeholder="一句话介绍...">
+        </div>
+        <button class="btn btn-primary" onclick="addSite()">保存添加</button>
+        <button class="btn btn-warning" onclick="resetData()">⚠️ 重置为默认列表</button>
+        <button class="btn btn-secondary" onclick="toggleAdminMode()">退出编辑模式</button>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">* 数据保存在当前浏览器本地。如果修改代码后没变化，请点击“重置为默认列表”。</p>
+    </div>
+
+    <!-- 网站列表网格 -->
+    <div id="siteGrid" class="grid">
+        <!-- 网站卡片将通过 JS 动态生成 -->
+    </div>
+</div>
+
+<!-- 登录模态框 -->
+<div id="loginModal">
+    <div class="modal-content">
+        <h3>管理员验证</h3>
+        <input type="password" id="adminPassword" class="form-control" placeholder="请输入管理密码" style="margin-bottom: 15px;">
+        <button class="btn btn-primary" onclick="checkPassword()">登录</button>
+        <button class="btn btn-secondary" onclick="closeLogin()">取消</button>
+    </div>
+</div>
+
+<script>
+    // ================= 配置区域 =================
+    const ADMIN_PASSWORD = "618033"; 
+    
+    // 默认数据 (您在这里修改列表)
+    const defaultSites = [
+        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型" },
+        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai" },
+        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai (注意网址修正)" },
+        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具" },
+        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员" },
+        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集" },
+        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎" },
+        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手" },
+        { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型" },
+        { name: "通义千问", url: "https://tongyi.aliyun.com/", desc: "阿里巴巴旗下大语言模型 (网址修正)" },
+        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型" },
+        { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型" },
+        { name: "腾讯元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型" },
+        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型" },
+        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型" },
+        { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成" }
+    ];
+
+    let sites = [];
+    let isAdmin = false;
+
+    // 初始化
+    window.onload = function() {
+        loadSites();
+        renderSites();
+    };
+
+    // 从 LocalStorage 加载数据
+    function loadSites() {
+        const stored = localStorage.getItem('ai_nav_sites');
+        if (stored) {
+            sites = JSON.parse(stored);
+            console.log("加载了本地存储的数据");
+        } else {
+            sites = [...defaultSites];
+            saveSites();
+            console.log("初始化了默认数据");
+        }
+    }
+
+    // 保存数据到 LocalStorage
+    function saveSites() {
+        localStorage.setItem('ai_nav_sites', JSON.stringify(sites));
+        renderSites();
+    }
+
+    // 【新增功能】强制重置数据
+    function resetData() {
+        if(confirm("确定要清空当前列表并恢复为代码中默认的最新列表吗？\n注意：您手动添加的自定义内容将会丢失！")) {
+            localStorage.removeItem('ai_nav_sites');
+            sites = [...defaultSites];
+            saveSites();
+            alert("已重置为默认列表！");
+        }
+    }
+
+    // 渲染网站列表
+    function renderSites(filterText = '') {
+        const grid = document.getElementById('siteGrid');
+        grid.innerHTML = '';
+
+        const filteredSites = sites.filter(site => 
+            site.name.toLowerCase().includes(filterText.toLowerCase()) || 
+            site.desc.toLowerCase().includes(filterText.toLowerCase())
+        );
+
+        if (filteredSites.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999;">没有找到相关工具</div>';
+            return;
+        }
+
+        filteredSites.forEach((site, index) => {
+            // 注意：这里的 index 是过滤后的索引，删除时需要找到原数组的索引
+            // 为了简单起见，我们在删除时通过名称匹配来查找，或者重新设计数据结构
+            // 这里采用简单策略：在过滤列表中传递原始索引可能会出错，我们改为通过名称查找删除
+            // 但为了保持代码简洁，我们假设用户主要在非过滤状态下删除，或者重新实现 delete 逻辑
+            
+            // 更稳健的做法：给每个 site 加个唯一 ID，或者在删除时遍历原数组
+            const originalIndex = sites.indexOf(site);
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const initial = site.name.charAt(0).toUpperCase();
+            
+            card.innerHTML = `
+                <button class="delete-btn" onclick="deleteSite(${originalIndex})" ${isAdmin ? 'style="display:flex"' : ''}>×</button>
+                <div class="card-header">
+                    <div class="card-icon">${initial}</div>
+                    <a href="${site.url}" target="_blank" class="card-title">${site.name}</a>
+                </div>
+                <div class="card-desc">${site.desc}</div>
+                <a href="${site.url}" target="_blank" class="card-link">去访问 →</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // 搜索过滤
+    function filterSites() {
+        const text = document.getElementById('searchInput').value;
+        renderSites(text);
+    }
+
+    // === 管理功能 ===
+
+    function showLogin() {
+        if (isAdmin) {
+            toggleAdminMode();
+        } else {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('adminPassword').focus();
+        }
+    }
+
+    function closeLogin() {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function checkPassword() {
+        const input = document.getElementById('adminPassword').value;
+        if (input === ADMIN_PASSWORD) {
+            isAdmin = true;
+            closeLogin();
+            toggleAdminMode();
+            alert("登录成功！现在您可以添加、删除或重置网站。");
+        } else {
+            alert("密码错误！");
+        }
+    }
+
+    function toggleAdminMode() {
+        const panel = document.getElementById('adminPanel');
+        if (isAdmin) {
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                isAdmin = false; 
+                // 注意：这里不退出登录状态变量，只是隐藏面板，方便再次点击显示
+                // 如果想彻底退出，需将 isAdmin = false 放在这里，并调整逻辑
+                // 当前逻辑：点击管理入口 -> 登录 -> 显示面板。再次点击管理入口 -> 隐藏面板 (保持登录态)
+                // 若要彻底退出，建议增加一个"注销"按钮，这里简化处理：隐藏即视为暂时退出编辑
+            } else {
+                panel.style.display = 'block';
+            }
+        } else {
+             panel.style.display = 'none';
+        }
+        renderSites(); 
+    }
+
+    function addSite() {
+        const name = document.getElementById('newName').value;
+        const url = document.getElementById('newUrl').value;
+        const desc = document.getElementById('newDesc').value;
+
+        if (!name || !url) {
+            alert("请填写名称和链接");
+            return;
+        }
+
+        let finalUrl = url;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            finalUrl = 'https://' + url;
+        }
+
+        sites.unshift({ name, url: finalUrl, desc: desc || '暂无描述' });
+        saveSites();
+        
+        document.getElementById('newName').value = '';
+        document.getElementById('newUrl').value = '';
+        document.getElementById('newDesc').value = '';
+        
+        alert("添加成功！");
+    }
+
+    function deleteSite(index) {
+        if(confirm('确定要删除 "' + sites[index].name + '" 吗？')) {
+            sites.splice(index, 1);
+            saveSites();
+        }
+    }
+
+    document.getElementById('adminPassword').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
+</script>
+<!-- 底部版权start -->
+<div class="footer"> 
+	<a href="//1.618033.com" style="color:#8C8C8C;" target="_blank"> © ♾️</a></p>
+</div>
+<!-- 底部版权end -->
+</body>
+</html>
