@@ -2,20 +2,17 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta content="telephone=no,email=no" name="format-detection">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="keywords" content="AI,1.618033,AINav,Ai导航" />
+    <meta name="description" content="Sex，life goes on。" />
+    <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
+    
     <title>AINav</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-	<meta content="telephone=no,email=no" name="format-detection">
-	<meta content="yes" name="apple-mobile-web-app-capable">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-	<meta name="apple-touch-fullscreen" content="yes" />
-	<meta name="keywords" content="AI,1.618033,AINav,Ai导航" />
-	<meta name="description" content="Sex，life goes on。" />
-	<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
-	<link rel="stylesheet" type="text/css" href="css/yidong.css" />
-	<script>document.addEventListener('visibilitychange',function(){if(document.visibilityState=='hidden'){normal_title=document.title;document.title='漫游中…';}else{document.title=normal_title;}});</script>
-</head>
+
     <style>
         :root {
             --primary-color: #2563eb;
@@ -157,7 +154,7 @@
 
         /* 管理面板样式 */
         #adminPanel {
-            display: none; /* 默认隐藏 */
+            display: none; 
             background: #fff;
             padding: 20px;
             border-radius: 12px;
@@ -189,269 +186,9 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
+            margin-right: 10px;
+            margin-top: 5px;
         }
 
         .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-danger { background-color: #ef4444; color: white; margin-left: 10px;}
-        .btn-secondary { background-color: #64748b; color: white; }
-
-        .delete-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #fee2e2;
-            color: #ef4444;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: none; /* 默认隐藏 */
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        /* 登录模态框 */
-        #loginModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <header>
-        <h1>🚀 AI 网址导航</h1>
-        <p>精选全球最实用的 AI 工具与资源</p>
-        <input type="text" id="searchInput" class="search-box" placeholder="搜索工具名称或描述..." onkeyup="filterSites()">
-        <button class="admin-btn" onclick="showLogin()">⚙️ 管理入口</button>
-    </header>
-
-    <!-- 管理面板 (添加新网站) -->
-    <div id="adminPanel">
-        <h3>➕ 添加新网站</h3>
-        <div class="form-group">
-            <label>网站名称</label>
-            <input type="text" id="newName" class="form-control" placeholder="例如：ChatGPT">
-        </div>
-        <div class="form-group">
-            <label>网站链接 (URL)</label>
-            <input type="url" id="newUrl" class="form-control" placeholder="https://...">
-        </div>
-        <div class="form-group">
-            <label>简短描述</label>
-            <input type="text" id="newDesc" class="form-control" placeholder="一句话介绍...">
-        </div>
-        <button class="btn btn-primary" onclick="addSite()">保存添加</button>
-        <button class="btn btn-secondary" onclick="toggleAdminMode()">退出编辑模式</button>
-        <p style="font-size: 12px; color: #666; margin-top: 10px;">* 数据保存在当前浏览器本地，更换设备需重新配置。</p>
-    </div>
-
-    <!-- 网站列表网格 -->
-    <div id="siteGrid" class="grid">
-        <!-- 网站卡片将通过 JS 动态生成 -->
-    </div>
-</div>
-
-<!-- 登录模态框 -->
-<div id="loginModal">
-    <div class="modal-content">
-        <h3>管理员验证</h3>
-        <input type="password" id="adminPassword" class="form-control" placeholder="请输入管理密码" style="margin-bottom: 15px;">
-        <button class="btn btn-primary" onclick="checkPassword()">登录</button>
-        <button class="btn btn-secondary" onclick="closeLogin()">取消</button>
-    </div>
-</div>
-
-<script>
-    // ================= 配置区域 =================
-    // ⚠️ 请在此处修改您的管理密码
-    const ADMIN_PASSWORD = "618033"; 
-    // ===========================================
-
-    // 默认数据 (如果本地没有数据则加载这些)
-    const defaultSites = [
-        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型" },
-        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai" },
-        { name: "Grok", url: "https://Grok.com", desc: "马斯克旗下Ai" },
-        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具" },
-        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员" },
-        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集" },
-        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎" },
-        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手" },
-        { name: "deepseek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型" },
-        { name: "千问", url: "https://qianwen.com", desc: "阿里巴巴旗下大语言模型" },
-        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型" },
-        { name: "lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型" },
-        { name: "元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型" },
-        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型" }
-    ];
-
-    let sites = [];
-    let isAdmin = false;
-
-    // 初始化
-    window.onload = function() {
-        loadSites();
-        renderSites();
-    };
-
-    // 从 LocalStorage 加载数据
-    function loadSites() {
-        const stored = localStorage.getItem('ai_nav_sites');
-        if (stored) {
-            sites = JSON.parse(stored);
-        } else {
-            sites = [...defaultSites];
-            saveSites();
-        }
-    }
-
-    // 保存数据到 LocalStorage
-    function saveSites() {
-        localStorage.setItem('ai_nav_sites', JSON.stringify(sites));
-        renderSites();
-    }
-
-    // 渲染网站列表
-    function renderSites(filterText = '') {
-        const grid = document.getElementById('siteGrid');
-        grid.innerHTML = '';
-
-        const filteredSites = sites.filter(site => 
-            site.name.toLowerCase().includes(filterText.toLowerCase()) || 
-            site.desc.toLowerCase().includes(filterText.toLowerCase())
-        );
-
-        filteredSites.forEach((site, index) => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            // 获取首字母作为图标
-            const initial = site.name.charAt(0).toUpperCase();
-            
-            card.innerHTML = `
-                <button class="delete-btn" onclick="deleteSite(${index})" ${isAdmin ? 'style="display:flex"' : ''}>×</button>
-                <div class="card-header">
-                    <div class="card-icon">${initial}</div>
-                    <a href="${site.url}" target="_blank" class="card-title">${site.name}</a>
-                </div>
-                <div class="card-desc">${site.desc}</div>
-                <a href="${site.url}" target="_blank" class="card-link">去访问 →</a>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    // 搜索过滤
-    function filterSites() {
-        const text = document.getElementById('searchInput').value;
-        renderSites(text);
-    }
-
-    // === 管理功能 ===
-
-    function showLogin() {
-        if (isAdmin) {
-            toggleAdminMode();
-        } else {
-            document.getElementById('loginModal').style.display = 'flex';
-            document.getElementById('adminPassword').focus();
-        }
-    }
-
-    function closeLogin() {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('adminPassword').value = '';
-    }
-
-    function checkPassword() {
-        const input = document.getElementById('adminPassword').value;
-        if (input === ADMIN_PASSWORD) {
-            isAdmin = true;
-            closeLogin();
-            toggleAdminMode();
-            alert("登录成功！现在您可以添加或删除网站。");
-        } else {
-            alert("密码错误！");
-        }
-    }
-
-    function toggleAdminMode() {
-        const panel = document.getElementById('adminPanel');
-        if (isAdmin) {
-            // 如果已经是管理员，点击按钮则是退出
-            if (panel.style.display === 'block') {
-                panel.style.display = 'none';
-                isAdmin = false; // 退出登录状态
-                alert("已退出编辑模式");
-            } else {
-                panel.style.display = 'block';
-            }
-        } else {
-             // 未登录状态点击退出按钮（理论上不会发生，因为按钮逻辑在 toggle 里）
-             panel.style.display = 'none';
-        }
-        renderSites(); // 重新渲染以显示/隐藏删除按钮
-    }
-
-    function addSite() {
-        const name = document.getElementById('newName').value;
-        const url = document.getElementById('newUrl').value;
-        const desc = document.getElementById('newDesc').value;
-
-        if (!name || !url) {
-            alert("请填写名称和链接");
-            return;
-        }
-
-        // 自动补全 https
-        let finalUrl = url;
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            finalUrl = 'https://' + url;
-        }
-
-        sites.unshift({ name, url: finalUrl, desc: desc || '暂无描述' });
-        saveSites();
-        
-        // 清空表单
-        document.getElementById('newName').value = '';
-        document.getElementById('newUrl').value = '';
-        document.getElementById('newDesc').value = '';
-        
-        alert("添加成功！");
-    }
-
-    function deleteSite(index) {
-        if(confirm('确定要删除 "' + sites[index].name + '" 吗？')) {
-            sites.splice(index, 1);
-            saveSites();
-        }
-    }
-
-    // 支持回车登录
-    document.getElementById('adminPassword').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            checkPassword();
-        }
-    });
-</script>
-
-</body>
-</html>
+        .btn-dan
