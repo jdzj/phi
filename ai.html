@@ -171,6 +171,9 @@
             text-decoration: none; display: block;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
         }
         .card-desc {
             font-size: 13px; color: var(--text-sub);
@@ -188,12 +191,13 @@
             font-size: 10px;
             padding: 2px 6px;
             border-radius: 4px;
-            margin-left: 5px;
-            vertical-align: middle;
+            margin-left: 6px;
+            white-space: nowrap;
         }
         .status-ok { background: #dcfce7; color: #166534; }
         .status-warn { background: #fef3c7; color: #92400e; }
         .status-err { background: #fee2e2; color: #991b1b; }
+        .status-pending { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
 
         .btn-visit {
             margin-top: auto; padding-top: 15px;
@@ -245,6 +249,7 @@
         .btn-success { background: var(--success); color: #fff; }
         .btn-warning { background: var(--warning); color: #fff; }
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
+        .btn-info { background: #0ea5e9; color: #fff; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .import-area {
@@ -265,10 +270,10 @@
             font-size: 12px;
             text-align: left;
             border: 1px solid var(--border);
+            display: none;
         }
         .log-item { margin-bottom: 4px; display: flex; align-items: flex-start; gap: 6px; }
-        .log-icon { font-weight: bold; }
-
+        
         .modal {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.6);
@@ -288,12 +293,12 @@
             border: 3px solid rgba(0,0,0,0.1);
             border-left-color: var(--primary);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 8px;
+            margin-right: 6px;
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -308,7 +313,7 @@
 <header class="header">
     <div class="logo"><span>⚡</span> AINav</div>
     <div class="search-box">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeyup="filterSites()">
+        <input type="text" id="searchInput" class="search-input" placeholder="搜索工具..." onkeyup="filterSites()">
         <span class="search-icon" onclick="showLogin()">⚙️</span>
     </div>
     <div class="tabs-container" id="tabsContainer"></div>
@@ -318,6 +323,7 @@
     <div id="adminPanel" class="admin-panel">
         <div class="panel-title">➕ 管理中心</div>
         
+        <!-- 手动添加 -->
         <div style="background: rgba(248, 250, 252, 0.8); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
             <div class="form-group">
                 <label class="form-label">网站名称</label>
@@ -336,23 +342,38 @@
                     </select>
                 </div>
             </div>
-            <button class="btn btn-primary" id="addBtn" onclick="addSiteWithCheck()">
-                <span id="addBtnText">添加并检测</span>
-            </button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-primary" onclick="addSiteFast()">
+                    快速添加
+                </button>
+                <button class="btn btn-info" onclick="addSiteWithCheck()" id="addCheckBtn">
+                    添加并检测
+                </button>
+            </div>
         </div>
 
+        <!-- 批量操作 -->
         <div class="import-area">
-            <div class="import-text">📂 批量导入并自动检测</div>
+            <div class="import-text">📂 批量导入 (秒级完成)</div>
             <p style="font-size: 12px; color: #15803d; margin: 0 0 10px 0;">
-                支持识别文件夹分类。<br>
-                <strong>内网/IP 链接</strong>将直接添加；<strong>外网链接</strong>将尝试获取标题并检测可用性。
+                立即导入所有书签，不进行检测。<br>
+                导入后可点击下方按钮统一检测可用性并补全描述。
             </p>
             <button class="btn btn-success" id="importBtn" onclick="document.getElementById('bookmarkFileInput').click()">
                 选择书签文件
             </button>
             <input type="file" id="bookmarkFileInput" accept=".html,.htm" style="display:none" onchange="handleFileSelect(this)">
             
-            <div id="importLog" class="log-box" style="display:none;"></div>
+            <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                <p style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
+                    当前列表中有 <span id="pendingCount" style="font-weight:bold; color:var(--warning)">0</span> 个未检测网址
+                </p>
+                <button class="btn btn-info" id="batchCheckBtn" onclick="startBatchCheck()" disabled>
+                    开始批量检测
+                </button>
+            </div>
+
+            <div id="importLog" class="log-box"></div>
         </div>
 
         <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -379,32 +400,34 @@
     const ADMIN_PASSWORD = "618033";
     
     const defaultSites = [
-        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型", category: "置顶" },
-        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai", category: "置顶" },
-        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai", category: "置顶" },
-        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具", category: "置顶" },
-        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员", category: "置顶" },
-        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽", category: "置顶" },
-        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎", category: "置顶" },
-        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全 AI 助手", category: "置顶" },
-        { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型", category: "置顶" },
-        { name: "通义千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶" },
-        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型", category: "置顶" },
-        { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型", category: "置顶" },
-        { name: "腾讯元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型", category: "置顶" },
-        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型", category: "置顶" },
-        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型", category: "置顶" },
-        { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成", category: "置顶" }
+        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型", category: "置顶", status: "ok" },
+        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai", category: "置顶", status: "ok" },
+        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai", category: "置顶", status: "ok" },
+        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具", category: "置顶", status: "ok" },
+        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员", category: "置顶", status: "ok" },
+        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽", category: "置顶", status: "ok" },
+        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎", category: "置顶", status: "ok" },
+        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全 AI 助手", category: "置顶", status: "ok" },
+        { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型", category: "置顶", status: "ok" },
+        { name: "通义千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶", status: "ok" },
+        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型", category: "置顶", status: "ok" },
+        { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型", category: "置顶", status: "ok" },
+        { name: "腾讯元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型", category: "置顶", status: "ok" },
+        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型", category: "置顶", status: "ok" },
+        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型", category: "置顶", status: "ok" },
+        { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成", category: "置顶", status: "ok" }
     ];
 
     let sites = [];
     let isAdmin = false;
     let currentCategory = "全部";
+    let isChecking = false; // 全局检测锁
 
     window.onload = function() {
         loadSites();
         renderTabs();
         renderSites();
+        updatePendingCount();
         document.getElementById('adminPassword').addEventListener('keypress', e => { if(e.key==='Enter') checkPassword(); });
     };
 
@@ -418,6 +441,7 @@
         localStorage.setItem('ai_nav_sites', JSON.stringify(sites));
         renderTabs();
         renderSites();
+        updatePendingCount();
     }
 
     function resetData() {
@@ -478,10 +502,19 @@
         filtered.forEach(site => {
             const idx = sites.indexOf(site);
             const initial = site.name.trim().charAt(0).toUpperCase() || '?';
-            const statusBadge = site.status ? 
-                (site.status === 'ok' ? '<span class="status-badge status-ok">可用</span>' : 
-                 site.status === 'warn' ? '<span class="status-badge status-warn">存疑</span>' : 
-                 '<span class="status-badge status-err">不可达</span>') : '';
+            
+            let statusBadge = '';
+            if(site.status === 'checking') {
+                statusBadge = '<span class="status-badge status-pending"><span class="spinner"></span>检测中</span>';
+            } else if(site.status === 'ok') {
+                statusBadge = '<span class="status-badge status-ok">可用</span>';
+            } else if(site.status === 'warn') {
+                statusBadge = '<span class="status-badge status-warn">存疑</span>';
+            } else if(site.status === 'err') {
+                statusBadge = '<span class="status-badge status-err">不可达</span>';
+            } else {
+                statusBadge = '<span class="status-badge status-pending">未检测</span>';
+            }
 
             const card = document.createElement('div');
             card.className = 'card';
@@ -502,6 +535,17 @@
     }
 
     function filterSites() { renderSites(document.getElementById('searchInput').value); }
+    
+    function updatePendingCount() {
+        const count = sites.filter(s => !s.status || s.status === 'pending').length;
+        document.getElementById('pendingCount').innerText = count;
+        document.getElementById('batchCheckBtn').disabled = (count === 0) || isChecking;
+        if(isChecking) {
+            document.getElementById('batchCheckBtn').innerHTML = '<span class="spinner"></span> 检测进行中...';
+        } else {
+            document.getElementById('batchCheckBtn').innerText = '开始批量检测';
+        }
+    }
 
     // === 管理逻辑 ===
     function showLogin() { isAdmin ? toggleAdminMode() : (document.getElementById('loginModal').style.display='flex'); }
@@ -511,6 +555,7 @@
             isAdmin = true; closeLogin();
             document.getElementById('adminPanel').style.display='block';
             renderTabs(); renderSites();
+            updatePendingCount();
         } else alert("密码错误");
     }
     function toggleAdminMode() {
@@ -520,121 +565,125 @@
     }
     function deleteSite(i) { if(confirm("确定删除?")) { sites.splice(i,1); saveSites(); } }
 
-    // === 核心检测逻辑 ===
-    
-    // 判断是否为内网/IP
+    // === 核心逻辑：快速添加 vs 检测添加 ===
+
     function isInternal(url) {
         try {
             const hostname = new URL(url).hostname;
             if(hostname === 'localhost' || hostname === '127.0.0.1') return true;
-            // IPv4 简单正则
             const ipRegex = /^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|0\.0\.0\.0)/;
-            if(ipRegex.test(hostname)) return true;
-            return false;
+            return ipRegex.test(hostname);
         } catch(e) { return false; }
     }
 
-    // 检测单个网站
-    async function checkSiteHealth(url, providedName, providedDesc) {
-        const result = { name: providedName, desc: providedDesc, status: 'ok', url: url };
-
-        // 1. 内网/IP 直接跳过检测
+    async function fetchSiteInfo(url) {
         if(isInternal(url)) {
-            console.log(`跳过内网检测: ${url}`);
-            if(!result.name) result.name = "内网服务";
-            if(!result.desc) result.desc = "本地或内网链接，已自动添加";
-            return result;
+            return { name: "内网服务", desc: "本地链接", status: 'ok' };
         }
-
-        // 2. 外网检测：使用 allorigins 代理获取 HTML
         try {
             const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-            const response = await fetch(proxyUrl);
+            // 设置超时
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+            
+            const response = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
             const data = await response.json();
             
             if(!data.contents) throw new Error("No content");
-
             const parser = new DOMParser();
             const doc = parser.parseFromString(data.contents, "text/html");
             
-            // 获取 Title
             const title = doc.querySelector('title');
-            if(title && title.textContent.trim() && !providedName) {
-                result.name = title.textContent.trim();
-            } else if (!providedName) {
-                result.name = new URL(url).hostname;
-            }
-
-            // 获取 Description
             const metaDesc = doc.querySelector('meta[name="description"]');
-            if(metaDesc && metaDesc.content.trim() && !providedDesc) {
-                result.desc = metaDesc.content.trim();
-            } else if (!providedDesc) {
-                result.desc = "自动添加的外网链接";
-            }
-
-            result.status = 'ok';
-        } catch (error) {
-            console.warn(`检测失败 ${url}:`, error);
-            result.status = 'warn'; // 标记为存疑，但保留
-            if(!providedName) result.name = new URL(url).hostname;
-            if(!providedDesc) result.desc = "无法自动获取描述 (可能网络受限或跨域拦截)，已保留链接";
+            
+            return {
+                name: title ? title.textContent.trim() : new URL(url).hostname,
+                desc: metaDesc ? metaDesc.content.trim() : "自动获取的描述",
+                status: 'ok'
+            };
+        } catch (e) {
+            return {
+                name: new URL(url).hostname,
+                desc: "无法获取描述 (可能网络受限)",
+                status: 'warn'
+            };
         }
-        return result;
     }
 
-    // 手动添加带检测
-    async function addSiteWithCheck() {
+    // 1. 快速添加 (无检测)
+    function addSiteFast() {
         const nameIn = document.getElementById('newName').value.trim();
         const urlIn = document.getElementById('newUrl').value.trim();
-        const descIn = document.getElementById('newDesc').value.trim();
         const catIn = document.getElementById('newCategory').value;
-        const btn = document.getElementById('addBtn');
-        const btnText = document.getElementById('addBtnText');
 
         if(!urlIn) { alert("请输入网址"); return; }
         let finalUrl = urlIn.startsWith('http') ? urlIn : 'https://' + urlIn;
-
         if(sites.some(s => s.url === finalUrl)) { alert("已存在"); return; }
 
-        // UI Loading
-        const originalText = btnText.innerText;
-        btnText.innerText = "检测中...";
-        btn.disabled = true;
-
-        const siteData = await checkSiteHealth(finalUrl, nameIn, descIn);
-        
-        sites.unshift({ ...siteData, category: catIn });
+        sites.unshift({
+            name: nameIn || new URL(finalUrl).hostname,
+            url: finalUrl,
+            desc: "", 
+            category: catIn,
+            status: 'pending' // 标记为未检测
+        });
         saveSites();
-
-        // Reset Form
         document.getElementById('newName').value = '';
         document.getElementById('newUrl').value = '';
-        document.getElementById('newDesc').value = '';
-        
-        btnText.innerText = originalText;
-        btn.disabled = false;
-
-        if(siteData.status === 'warn') {
-            alert(`添加成功，但检测到该链接可能不可达或获取信息失败。\n名称：${siteData.name}\n状态：存疑 (已保留)`);
-        } else {
-            // alert("添加成功!"); // 静默成功体验更好
-        }
+        // 不弹窗，体验更流畅
     }
 
-    // 批量导入带检测
-    async function handleFileSelect(input) {
+    // 2. 添加并检测 (单个)
+    async function addSiteWithCheck() {
+        const nameIn = document.getElementById('newName').value.trim();
+        const urlIn = document.getElementById('newUrl').value.trim();
+        const catIn = document.getElementById('newCategory').value;
+        const btn = document.getElementById('addCheckBtn');
+
+        if(!urlIn) { alert("请输入网址"); return; }
+        let finalUrl = urlIn.startsWith('http') ? urlIn : 'https://' + urlIn;
+        if(sites.some(s => s.url === finalUrl)) { alert("已存在"); return; }
+
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerText = "检测中...";
+
+        // 先占位
+        const tempSite = {
+            name: nameIn || "检测中...",
+            url: finalUrl,
+            desc: "",
+            category: catIn,
+            status: 'checking'
+        };
+        sites.unshift(tempSite);
+        renderSites(); // 刷新显示 loading 状态
+
+        const info = await fetchSiteInfo(finalUrl);
+        
+        // 更新数据
+        const idx = sites.findIndex(s => s.url === finalUrl);
+        if(idx !== -1) {
+            sites[idx].name = nameIn || info.name;
+            sites[idx].desc = info.desc;
+            sites[idx].status = info.status;
+            saveSites();
+        }
+
+        btn.disabled = false;
+        btn.innerText = originalText;
+        document.getElementById('newName').value = '';
+        document.getElementById('newUrl').value = '';
+    }
+
+    // 3. 快速导入 (无检测)
+    function handleFileSelect(input) {
         const file = input.files[0];
         if(!file) return;
 
-        const logBox = document.getElementById('importLog');
-        const importBtn = document.getElementById('importBtn');
-        logBox.style.display = 'block';
-        logBox.innerHTML = '<div class="log-item"><span class="spinner"></span> 开始解析文件...</div>';
-        importBtn.disabled = true;
-
         const reader = new FileReader();
-        reader.onload = async function(e) {
+        reader.onload = function(e) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(e.target.result, "text/html");
             const dtElements = doc.querySelectorAll('dt');
@@ -642,13 +691,7 @@
             let currentFolder = "未分类";
             let count = 0;
             let skip = 0;
-            let processed = 0;
-            const total = dtElements.length; // 粗略估计
 
-            logBox.innerHTML = `<div class="log-item">📂 发现约 ${total} 个条目，开始逐个检测...</div>`;
-
-            // 为了不阻塞 UI，分批次处理或使用 async/await 循环
-            // 注意：频繁请求公共代理可能会触发限流，这里加一点延迟
             for(let dt of dtElements) {
                 const h3 = dt.querySelector('h3');
                 const a = dt.querySelector('a');
@@ -666,48 +709,95 @@
                     if(!url || url.startsWith('#')) continue;
                     if(sites.some(s => s.url === url)) { skip++; continue; }
 
-                    processed++;
-                    logBox.innerHTML += `<div class="log-item">⏳ 检测 (${processed}): ${name || url}...</div>`;
-                    logBox.scrollTop = logBox.scrollHeight;
-
-                    // 执行检测
-                    const siteData = await checkSiteHealth(url, name, "");
-                    
-                    sites.unshift({ ...siteData, category: currentFolder });
+                    sites.unshift({
+                        name: name || new URL(url).hostname,
+                        url: url,
+                        desc: "",
+                        category: currentFolder,
+                        status: 'pending' // 标记为待检测
+                    });
                     count++;
-
-                    // 更新日志状态
-                    const lastLog = logBox.lastElementChild;
-                    if(siteData.status === 'ok') {
-                        lastLog.innerHTML = `✅ <b>${siteData.name}</b> - 可用`;
-                        lastLog.style.color = '#166534';
-                    } else {
-                        lastLog.innerHTML = `⚠️ <b>${siteData.name}</b> - 存疑/不可达 (已保留)`;
-                        lastLog.style.color = '#92400e';
-                    }
-                    
-                    // 每处理 5 个保存一次，防止崩溃
-                    if(count % 5 === 0) saveSites();
-                    
-                    // 简单的防限流延迟 (200ms)
-                    await new Promise(r => setTimeout(r, 200));
                 }
             }
 
             saveSites();
-            logBox.innerHTML += `<div class="log-item" style="margin-top:10px; font-weight:bold; border-top:1px solid #ccc; padding-top:5px;">
-                🎉 完成! 导入 ${count} 个新网址，跳过 ${skip} 个重复项。
-            </div>`;
-            importBtn.disabled = false;
-            renderTabs();
-            renderSites();
+            alert(`✅ 极速导入完成!\n成功添加: ${count}\n跳过重复: ${skip}\n\n所有新网址标记为“未检测”，可在下方点击“批量检测”来补全信息。`);
             input.value = '';
+            
+            // 自动展开日志区提示
+            const logBox = document.getElementById('importLog');
+            logBox.style.display = 'block';
+            logBox.innerHTML = `<div class="log-item">✅ 已导入 ${count} 个网址，状态：未检测。请点击下方按钮开始检测。</div>`;
         };
         reader.readAsText(file);
     }
 
+    // 4. 批量检测
+    async function startBatchCheck() {
+        if(isChecking) return;
+        isChecking = true;
+        updatePendingCount();
+
+        const logBox = document.getElementById('importLog');
+        logBox.style.display = 'block';
+        logBox.innerHTML = '<div class="log-item">🚀 开始批量检测...</div>';
+
+        // 找出所有 pending 的网址
+        const toCheckIndices = sites.map((s, i) => (s.status === 'pending' || !s.status) ? i : -1).filter(i => i !== -1);
+        
+        let processed = 0;
+        const total = toCheckIndices.length;
+
+        if(total === 0) {
+            alert("没有需要检测的网址！");
+            isChecking = false;
+            updatePendingCount();
+            return;
+        }
+
+        for(let idx of toCheckIndices) {
+            const site = sites[idx];
+            // 更新状态为 checking
+            site.status = 'checking';
+            renderSites(); // 局部刷新太慢，直接重绘整个列表可能会闪，这里简单处理
+            // 优化：只更新日志
+            processed++;
+            logBox.innerHTML += `<div class="log-item">⏳ [${processed}/${total}] 检测 ${site.name}...</div>`;
+            logBox.scrollTop = logBox.scrollHeight;
+
+            // 执行检测
+            const info = await fetchSiteInfo(site.url);
+            
+            // 更新数据
+            if(!site.name || site.name === new URL(site.url).hostname) {
+                 // 如果原名就是域名或者为空，才替换，否则保留用户自定义名（如果是导入的通常保留原书签名）
+                 // 这里策略：如果导入时名字很短或是域名，就替换成标题
+                 if(site.name.length < 10 || site.name.includes('.')) {
+                     site.name = info.name;
+                 }
+            }
+            site.desc = info.desc;
+            site.status = info.status;
+            
+            // 每 5 个保存一次
+            if(processed % 5 === 0) {
+                localStorage.setItem('ai_nav_sites', JSON.stringify(sites));
+                renderSites();
+            }
+
+            // 限制频率
+            await new Promise(r => setTimeout(r, 300));
+        }
+
+        saveSites();
+        logBox.innerHTML += `<div class="log-item" style="margin-top:10px; font-weight:bold; color:var(--success)">🎉 全部检测完成!</div>`;
+        isChecking = false;
+        updatePendingCount();
+        renderSites();
+    }
+
 </script>
-<div style="text-align: center;"> 
+    <div style="text-align: center;"> 
     <a href="//1.618033.com" style="color:#8C8C8C;" target="_blank">© ♾️</a>
 </div> 
 </body>
