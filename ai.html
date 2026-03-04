@@ -1,164 +1,437 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Phi AI</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-	<meta content="telephone=no,email=no" name="format-detection">
-	<meta content="yes" name="apple-mobile-web-app-capable">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-	<meta name="apple-touch-fullscreen" content="yes" />
-	<meta name="keywords" content="phi,0.618033,phi ai,AI导航" />
-	<meta name="description" content="Phi（黄金比例），一切都是最好的安排。" />
-	<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
-	<link rel="stylesheet" type="text/css" href="css/yidong.css" />
-	<script>document.addEventListener('visibilitychange',function(){if(document.visibilityState=='hidden'){normal_title=document.title;document.title='漫游中…';}else{document.title=normal_title;}});</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AINav</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* 管理按钮 */
+        .admin-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .admin-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* 网格布局 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-main);
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 15px;
+            flex: 1;
+        }
+
+        .card-link {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .card-link:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* 管理面板样式 */
+        #adminPanel {
+            display: none; /* 默认隐藏 */
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-danger { background-color: #ef4444; color: white; margin-left: 10px;}
+        .btn-secondary { background-color: #64748b; color: white; }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none; /* 默认隐藏 */
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* 登录模态框 */
+        #loginModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+    </style>
 </head>
+<body>
 
-<body> 
-	<!-- 搜索栏start -->
-	<div class="baidu baidu-2">
-		<div style="font-size:15px;color:#FFFFFF" align="center"><script src="https://www.jdzjw.com/one/api.php"></script></div></br>
-		<form name="f" action="https://www.google.com/search?q=" target="_blank">
-			<div class="Select-box-2" id="baidu">
-				<ul>
-					<li class="this_s">谷歌</li>
-					<li class="so_s">360</li>
-					<li class="google_s">谷歌</li>
-					<li class="baidu_s">百度</li>					
-					<li class="weixin_s">微信</li>
-					<li class="toutiao_s">Perplexity</li>
-					<li class="bing_s">必应</li>					
-					<li class="pan_s">网盘</li>
-				</ul>
-			</div>
-			<div class="in5">
-			<input name="q" id="kw-2" maxlength="100" autocomplete="off" type="text">
-			<div class="qingkong" id="qingkong" title="清空">x</div>
-			</div>
-			<input value="搜 索" id="su-2" type="submit">
-		</form>
-		<ul class="keylist"></ul>
-	</div>
-	<!-- 搜索栏end -->
+<div class="container">
+    <header>
+        <h1>🚀 AI 网址导航</h1>
+        <p>精选全球最实用的 AI 工具与资源</p>
+        <input type="text" id="searchInput" class="search-box" placeholder="搜索工具名称或描述..." onkeyup="filterSites()">
+        <button class="admin-btn" onclick="showLogin()">⚙️ 管理入口</button>
+    </header>
 
-	<!-- 内容start -->
-<div class="body">
-	<div class="content">
-	<div class="jianjie">
-	<div class="jj-list">
-	<div class="jj-list-tit">世界 · world</div>
-	<ul class="jj-list-con">
-          <li> <a href="https://openai.com" class="link-3" target="_blank">OpenAI</a></li>
-	  <li><a href="https://ai.google" class="link-3" target="_blank">Google AI</a></li>
-	  <li><a href="https://gemini.google.com/" class="link-3" target="_blank">Gemini</a></li>
-          <li><a href="https://beta.dreamstudio.ai/generate" class="link-3" target="_blank">Stable Diffusion</a></li>
-	  <li><a href="https://www.bing.com/images/create" class="link-3" target="_blank">Bing Image</a></li>
-          <li><a href="https://creator.nightcafe.studio/" class="link-3" target="_blank">NightCafe Studio</a></li> 
-          <li><a href="https://aitestkitchen.withgoogle.com/tools/image-fx" class="link-3" target="_blank">ImageFX</a></li>
-          <li><a href="https://lexica.art/" class="link-3" target="_blank">Lexica</a></li>
-          <li><a href="https://simplified.com/zh-ai-image-generator" class="link-3" target="_blank">simplified</a></li>
-	</ul>
-	</div>
-		
-	<div class="jj-list">
-	<div class="jj-list-tit">中国 · China</div>
-	<ul class="jj-list-con">
-          <li><a href="https://www.deepsek.com/" class="link-3" target="_blank">深度求索</a></li>
-          <li><a href="https://qianwen.aliyun.com/" class="link-3" target="_blank">通义千问</a></li>
-          <li><a href="https://kimi.moonshot.cn/" class="link-3" target="_blank">Kimi</a></li>       
-          <li><a href="https://hunyuan.tencent.com/" class="link-3" target="_blank">腾讯混元</a></li>
-          <li><a href="https://www.doubao.com/" class="link-3" target="_blank">抖音豆包</a></li>
-	  <li><a href="https://coze.cn/" class="link-3" target="_blank">扣子</a></li>
-          <li><a href="https://chat.xverse.cn/" class="link-3" target="_blank">元象</a></li>
-          <li><a href="https://xinghuo.xfyun.cn/" class="link-3" target="_blank">讯飞星火</a></li>
-          <li><a href="https://ai.360.com/" class="link-3" target="_blank">360智脑</a></li>
-	</ul>
+    <!-- 管理面板 (添加新网站) -->
+    <div id="adminPanel">
+        <h3>➕ 添加新网站</h3>
+        <div class="form-group">
+            <label>网站名称</label>
+            <input type="text" id="newName" class="form-control" placeholder="例如：ChatGPT">
         </div>
-				
-	<div class="jj-list">
-	<div class="jj-list-tit">发现 · discover</div>
-	<ul class="jj-list-con">
-          <li><a href="https://x.ai/" class="link-3" target="_blank">x.ai</a></li>
-          <li><a href="https://copilot.microsoft.com/" class="link-3" target="_blank">copilot</a></li>
-	  <li><a href="https://chandler.bet/" class="link-3" target="_blank">chandler</a></li>
-	  <li><a href="https://www.anthropic.com/claude" class="link-3" target="_blank">Claude</a></li>          
-          <li><a href="https://poe.com/" class="link-3" target="_blank">Poe</a></li>						
-          <li><a href="https://sd.study.163.com/artWorks/painting" class="link-3" target="_blank">网易工坊</a></li>
-          <li><a href="https://photo.baidu.com/photasy" class="link-3" target="_blank">超能画布</a></li>        
-          <li><a href="https://www.gaoding.com/ai" class="link-3" target="_blank">稿定ai</a></li>	  
-	  <li><a href="https://jimeng.jianying.com/" class="link-3" target="_blank">即梦</a></li>         
-	</ul>
-	</div>
-		
-	<div class="jj-list">
-	<div class="jj-list-tit">影音 · 娱乐</div>
-	<ul class="jj-list-con">
-          <li><a href="https://www.iqiyi.com/" class="link-3" target="_blank">爱奇艺</a></li>
-          <li><a href="https://v.qq.com/" class="link-3" target="_blank">腾讯视频</a></li>          
-          <li><a href="https://www.bilibili.com/" class="link-3" target="_blank">哔哩哔哩</a></li>
-          <li><a href="https://study.163.com/" class="link-3" target="_blank">网易云课堂</a></li>          
-          <li><a href="https://www.doyoudo.com/" class="link-3" target="_blank">DoYouDo</a></li>          
-          <li><a href="https://radio.garden" class="link-3" target="_blank">全球广播</a></li>
-          <li><a href="https://music.apple.com/cn" class="link-3" target="_blank">Apple music</a></li>
-          <li><a href="https://tv.cctv.com/live/cctv5" class="link-3" target="_blank">电视直播</a></li>
-	  <li><a href="https://music.qq.com/" class="link-3" target="_blank">QQ音乐</a></li>
-	  <li><a href="https://www.iconfont.cn/" class="link-3" target="_blank">阿里图库</a></li>
-          <li><a href="https://exif.tuchong.com/" class="link-3" target="_blank">图虫</a></li>
-	  <li><a href="https://squoosh.app/" class="link-3" target="_blank">压缩图片</a></li>
-	</ul>
-	</div>
-	
-	<div class="jj-list">
-	<div class="jj-list-tit">创意 · 资源</div>
-	<ul class="jj-list-con">
-          <li><a href="https://map.baidu.com/" class="link-3" target="_blank">百度地图</a></li>
-          <li><a href="https://www.google.com/maps" class="link-3" target="_blank">谷歌地图</a></li>
-          <li><a href="http://api.map.baidu.com/lbsapi/getpoint/" class="link-3" target="_blank">拾取坐标</a></li>          
-	  <li><a href="https://www.tianditu.gov.cn/" class="link-3" target="_blank">天地图</a></li>					
-          <li><a href="https://www.fotor.com.cn/" class="link-3" target="_blank">懒设计</a></li>
-	  <li><a href="https://www.toolnb.com" class="link-3" target="_blank">程序员工具</a></li>	
-          <li><a href="https://zh.wikipedia.org/" class="link-3" target="_blank">维基百科</a></li>
-	  <li><a href="https://zh.wikihow.com/" class="link-3" target="_blank">wikihow</a></li>
-	  <li><a href="https://chat.openai.com/" class="link-3" target="_blank">ChatGPT</a></li>
-          <li><a href="https://www.pexels.com/" class="link-3" target="_blank">Pexels</a></li>
-          <li><a href="https://ezgif.com/" class="link-3" target="_blank">EZGif</a></li>
-          <li><a href="https://toolwa.com/whois/" class="link-3" target="_blank">Whois</a></li>
-	</ul>
-	</div>
+        <div class="form-group">
+            <label>网站链接 (URL)</label>
+            <input type="url" id="newUrl" class="form-control" placeholder="https://...">
+        </div>
+        <div class="form-group">
+            <label>简短描述</label>
+            <input type="text" id="newDesc" class="form-control" placeholder="一句话介绍...">
+        </div>
+        <button class="btn btn-primary" onclick="addSite()">保存添加</button>
+        <button class="btn btn-secondary" onclick="toggleAdminMode()">退出编辑模式</button>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">* 数据保存在当前浏览器本地，更换设备需重新配置。</p>
+    </div>
 
-	<div class="jj-list">
-	<div class="jj-list-tit">工具 · 学习</div>
-        <ul class="jj-list-con">
-          <li><a href="/tools/revise/" class="link-3" target="_blank">排版助手</a></li>
-          <li><a href="https://bigjpg.com" class="link-3" target="_blank">图片放大</a></li>
-	  <li><a href="https://convertio.co/zh/" class="link-3" target="_blank">图片转换</a></li>
-          <li><a href="https://imgse.com/" class="link-3" target="_blank">图床</a></li>
-          <li><a href="/ai.html" class="link-3" target="_blank">菜书AI</a></li>          
-          <li><a href="https://cli.im/" class="link-3" target="_blank">草料二维码</a></li>          
-          <li><a href="http://tool.mkblog.cn" class="link-3" target="_blank">孟坤工具箱</a></li>
-          <li><a href="https://tool.chinaz.com/" class="link-3" target="_blank">站长工具</a></li>
-	  <li><a href="/tools/dic/" class="link-3" target="_blank">在线字典</a></li>
-          <li><a href="http://www.hhax.org/" class="link-3" target="_blank">韩红基金会</a></li>
-	  <li><a href="https://gongyi.qq.com/" class="link-3" target="_blank">腾讯公益</a></li>
-	  <li><a href="https://www.unicef.org/zh" class="link-3" target="_blank">联合国基金会</a></li>
-        </ul>
-	</div>
+    <!-- 网站列表网格 -->
+    <div id="siteGrid" class="grid">
+        <!-- 网站卡片将通过 JS 动态生成 -->
+    </div>
 </div>
-<!-- 内容end -->
 
-<!-- 底部版权start -->
-<div class="footer1">
-	<a href="//0.618033.com" style="color:#8C8C8C;" target="_blank"> © 2025 Maintained by phi</a></p>
+<!-- 登录模态框 -->
+<div id="loginModal">
+    <div class="modal-content">
+        <h3>管理员验证</h3>
+        <input type="password" id="adminPassword" class="form-control" placeholder="请输入管理密码" style="margin-bottom: 15px;">
+        <button class="btn btn-primary" onclick="checkPassword()">登录</button>
+        <button class="btn btn-secondary" onclick="closeLogin()">取消</button>
+    </div>
 </div>
-</div>
-<div class="footer"> 
-	<a href="//0.618033.com" style="color:#8C8C8C;" target="_blank"> © 2025 Maintained by phi</a></p>
-</div>
-<!-- 底部版权end -->
-</div>
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/js.js"></script>
+
+<script>
+    // ================= 配置区域 =================
+    // ⚠️ 请在此处修改您的管理密码
+    const ADMIN_PASSWORD = "618033"; 
+    // ===========================================
+
+    // 默认数据 (如果本地没有数据则加载这些)
+    const defaultSites = [
+        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型" },
+        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具" },
+        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员" },
+        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集" },
+        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎" },
+        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手" }
+    ];
+
+    let sites = [];
+    let isAdmin = false;
+
+    // 初始化
+    window.onload = function() {
+        loadSites();
+        renderSites();
+    };
+
+    // 从 LocalStorage 加载数据
+    function loadSites() {
+        const stored = localStorage.getItem('ai_nav_sites');
+        if (stored) {
+            sites = JSON.parse(stored);
+        } else {
+            sites = [...defaultSites];
+            saveSites();
+        }
+    }
+
+    // 保存数据到 LocalStorage
+    function saveSites() {
+        localStorage.setItem('ai_nav_sites', JSON.stringify(sites));
+        renderSites();
+    }
+
+    // 渲染网站列表
+    function renderSites(filterText = '') {
+        const grid = document.getElementById('siteGrid');
+        grid.innerHTML = '';
+
+        const filteredSites = sites.filter(site => 
+            site.name.toLowerCase().includes(filterText.toLowerCase()) || 
+            site.desc.toLowerCase().includes(filterText.toLowerCase())
+        );
+
+        filteredSites.forEach((site, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            // 获取首字母作为图标
+            const initial = site.name.charAt(0).toUpperCase();
+            
+            card.innerHTML = `
+                <button class="delete-btn" onclick="deleteSite(${index})" ${isAdmin ? 'style="display:flex"' : ''}>×</button>
+                <div class="card-header">
+                    <div class="card-icon">${initial}</div>
+                    <a href="${site.url}" target="_blank" class="card-title">${site.name}</a>
+                </div>
+                <div class="card-desc">${site.desc}</div>
+                <a href="${site.url}" target="_blank" class="card-link">访问网站 →</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // 搜索过滤
+    function filterSites() {
+        const text = document.getElementById('searchInput').value;
+        renderSites(text);
+    }
+
+    // === 管理功能 ===
+
+    function showLogin() {
+        if (isAdmin) {
+            toggleAdminMode();
+        } else {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('adminPassword').focus();
+        }
+    }
+
+    function closeLogin() {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function checkPassword() {
+        const input = document.getElementById('adminPassword').value;
+        if (input === ADMIN_PASSWORD) {
+            isAdmin = true;
+            closeLogin();
+            toggleAdminMode();
+            alert("登录成功！现在您可以添加或删除网站。");
+        } else {
+            alert("密码错误！");
+        }
+    }
+
+    function toggleAdminMode() {
+        const panel = document.getElementById('adminPanel');
+        if (isAdmin) {
+            // 如果已经是管理员，点击按钮则是退出
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                isAdmin = false; // 退出登录状态
+                alert("已退出编辑模式");
+            } else {
+                panel.style.display = 'block';
+            }
+        } else {
+             // 未登录状态点击退出按钮（理论上不会发生，因为按钮逻辑在 toggle 里）
+             panel.style.display = 'none';
+        }
+        renderSites(); // 重新渲染以显示/隐藏删除按钮
+    }
+
+    function addSite() {
+        const name = document.getElementById('newName').value;
+        const url = document.getElementById('newUrl').value;
+        const desc = document.getElementById('newDesc').value;
+
+        if (!name || !url) {
+            alert("请填写名称和链接");
+            return;
+        }
+
+        // 自动补全 https
+        let finalUrl = url;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            finalUrl = 'https://' + url;
+        }
+
+        sites.unshift({ name, url: finalUrl, desc: desc || '暂无描述' });
+        saveSites();
+        
+        // 清空表单
+        document.getElementById('newName').value = '';
+        document.getElementById('newUrl').value = '';
+        document.getElementById('newDesc').value = '';
+        
+        alert("添加成功！");
+    }
+
+    function deleteSite(index) {
+        if(confirm('确定要删除 "' + sites[index].name + '" 吗？')) {
+            sites.splice(index, 1);
+            saveSites();
+        }
+    }
+
+    // 支持回车登录
+    document.getElementById('adminPassword').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
+</script>
+
 </body>
 </html>
