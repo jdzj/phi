@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>AINav</title>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
     
@@ -12,16 +10,16 @@
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
-            --bg-card: rgba(255, 255, 255, 0.9); /* 卡片半透明 */
+            --bg-card: rgba(255, 255, 255, 0.92);
             --bg-panel: rgba(255, 255, 255, 0.95);
             --text-main: #0f172a;
             --text-sub: #64748b;
-            --border: rgba(226, 232, 240, 0.8);
+            --border: rgba(226, 232, 240, 0.6);
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             --radius: 16px;
-            --tab-active-bg: #eff6ff;
-            --tab-active-text: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -32,36 +30,32 @@
             margin: 0;
             padding: 0;
             line-height: 1.5;
-            /* 背景图设置 */
             background-image: url('https://bing.ee123.net/dayimg.jpg');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* 固定背景，滚动时内容浮动 */
+            background-attachment: fixed; 
             background-repeat: no-repeat;
             min-height: 100vh;
         }
 
-        /* 全局遮罩，确保文字清晰度 */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(248, 250, 252, 0.25); /* 白色半透明蒙版 */
+            background: rgba(255, 255, 255, 0.35); 
             z-index: -1;
-            backdrop-filter: blur(0px); /* 轻微模糊背景图 */
+            backdrop-filter: blur(0px); 
         }
 
-        /* 头部 */
         .header {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.7);
             padding: 30px 20px 20px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid var(--border);
-            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.5);
         }
 
         .logo {
@@ -72,11 +66,10 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            color: var(--text-main);
+            text-shadow: 0 2px 4px rgba(255,255,255,0.8);
         }
         .logo span { color: var(--primary); }
 
-        /* 搜索框 */
         .search-box {
             position: relative;
             max-width: 500px;
@@ -85,17 +78,16 @@
         .search-input {
             width: 100%;
             padding: 12px 45px 12px 20px;
-            border: 2px solid var(--border);
+            border: 1px solid rgba(255,255,255,0.8);
             border-radius: 50px;
             font-size: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            transition: all 0.2s;
-            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .search-input:focus {
             border-color: var(--primary);
             background: #fff;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
         }
         .search-icon {
             position: absolute;
@@ -107,14 +99,12 @@
             font-size: 18px;
         }
 
-        /* 分类选项卡 */
         .tabs-container {
             max-width: 1000px;
             margin: 0 auto;
             overflow-x: auto;
             white-space: nowrap;
             padding-bottom: 5px;
-            -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
         .tabs-container::-webkit-scrollbar { display: none; }
@@ -128,62 +118,41 @@
             font-weight: 500;
             color: var(--text-sub);
             background: rgba(255, 255, 255, 0.6);
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255,255,255,0.5);
             cursor: pointer;
-            transition: all 0.2s;
+            backdrop-filter: blur(4px);
         }
-        .tab-btn:hover { background: rgba(255, 255, 255, 0.9); }
         .tab-btn.active {
-            background: var(--tab-active-bg);
-            color: var(--tab-active-text);
-            border-color: var(--tab-active-text);
+            background: #fff;
+            color: var(--primary);
+            border-color: var(--primary);
             font-weight: 600;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
-        /* 容器与网格 */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        /* 置顶区域特殊样式 (可选，这里保持统一但可以通过标题区分) */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 30px 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .section-title::before {
-            content: '📌';
-            font-size: 20px;
-        }
-
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 24px;
         }
 
-        /* 卡片 */
         .card {
             background: var(--bg-card);
             border-radius: var(--radius);
             padding: 24px;
             box-shadow: var(--shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
             position: relative;
             display: flex;
             flex-direction: column;
             height: 100%;
-            border: 1px solid rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.6);
             backdrop-filter: blur(5px);
         }
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(37, 99, 235, 0.3);
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
         }
         
         .card-top { display: flex; align-items: flex-start; margin-bottom: 12px; }
@@ -210,19 +179,29 @@
         }
         .card-tag {
             font-size: 11px; color: var(--primary);
-            background: var(--tab-active-bg);
+            background: rgba(239, 246, 255, 0.9);
             padding: 2px 8px; border-radius: 4px;
             display: inline-block; margin-top: 8px;
             font-weight: 600;
         }
+        .status-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .status-ok { background: #dcfce7; color: #166534; }
+        .status-warn { background: #fef3c7; color: #92400e; }
+        .status-err { background: #fee2e2; color: #991b1b; }
+
         .btn-visit {
             margin-top: auto; padding-top: 15px;
             display: block; width: 100%;
             padding: 10px; text-align: center;
-            background: rgba(248, 250, 252, 0.8); color: var(--text-main);
+            background: rgba(248, 250, 252, 0.6);
             text-decoration: none; border-radius: 8px;
             font-size: 14px; font-weight: 500;
-            transition: all 0.2s;
         }
         .card:hover .btn-visit { background: var(--primary); color: #fff; }
 
@@ -236,16 +215,14 @@
             z-index: 10;
         }
 
-        /* 管理面板 */
         .admin-panel {
             display: none; 
             background: var(--bg-panel);
             border-radius: var(--radius);
             padding: 25px; margin: 20px auto;
             max-width: 600px;
-            box-shadow: var(--shadow-hover);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.8);
         }
         .panel-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
         .form-group { margin-bottom: 15px; }
@@ -253,8 +230,7 @@
         .form-input, .form-select {
             width: 100%; padding: 10px;
             border: 1px solid var(--border); border-radius: 8px;
-            font-size: 14px; background: rgba(255,255,255,0.8);
-            color: var(--text-main);
+            font-size: 14px; background: rgba(255,255,255,0.9);
         }
         .form-row { display: flex; gap: 10px; }
         .form-row .form-group { flex: 1; }
@@ -263,13 +239,13 @@
             padding: 10px 20px; border: none; border-radius: 8px;
             font-size: 14px; font-weight: 500; cursor: pointer;
             display: inline-flex; align-items: center; gap: 6px;
-            transition: opacity 0.2s;
         }
         .btn:hover { opacity: 0.9; }
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-success { background: #10b981; color: #fff; }
-        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-warning { background: var(--warning); color: #fff; }
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .import-area {
             background: rgba(240, 253, 244, 0.8); 
@@ -278,25 +254,52 @@
             margin-top: 20px;
         }
         .import-text { font-size: 13px; color: #166534; margin-bottom: 10px; }
+        
+        .log-box {
+            margin-top: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        .log-item { margin-bottom: 4px; display: flex; align-items: flex-start; gap: 6px; }
+        .log-icon { font-weight: bold; }
 
-        /* 模态框 */
         .modal {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             z-index: 1000; align-items: center; justify-content: center;
         }
         .modal-content {
             background: #fff; padding: 30px; border-radius: 20px;
             width: 90%; max-width: 360px; text-align: center;
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow);
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(0,0,0,0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
         @media (max-width: 600px) {
             .grid { grid-template-columns: 1fr; }
             .form-row { flex-direction: column; gap: 0; }
-            .logo { font-size: 22px; }
         }
     </style>
 </head>
@@ -304,27 +307,21 @@
 
 <header class="header">
     <div class="logo"><span>⚡</span> AINav</div>
-    
     <div class="search-box">
         <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeyup="filterSites()">
-        <span class="search-icon" onclick="showLogin()" title="♾️">⚙️</span>
+        <span class="search-icon" onclick="showLogin()">⚙️</span>
     </div>
-
-    <!-- 分类选项卡 -->
-    <div class="tabs-container" id="tabsContainer">
-        <!-- JS 动态生成 -->
-    </div>
+    <div class="tabs-container" id="tabsContainer"></div>
 </header>
 
 <div class="container">
-    <!-- 管理面板 -->
     <div id="adminPanel" class="admin-panel">
         <div class="panel-title">➕ 管理中心</div>
         
-        <div style="background: rgba(248, 250, 252, 0.6); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+        <div style="background: rgba(248, 250, 252, 0.8); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
             <div class="form-group">
                 <label class="form-label">网站名称</label>
-                <input type="text" id="newName" class="form-input" placeholder="例如：ChatGPT">
+                <input type="text" id="newName" class="form-input" placeholder="留空则自动获取">
             </div>
             <div class="form-row">
                 <div class="form-group" style="flex: 2;">
@@ -332,50 +329,45 @@
                     <input type="url" id="newUrl" class="form-input" placeholder="https://...">
                 </div>
                 <div class="form-group" style="flex: 1.5;">
-                    <label class="form-label">所属分类</label>
+                    <label class="form-label">分类</label>
                     <select id="newCategory" class="form-select">
-                        <option value="置顶">📌 置顶 (首页优先)</option>
+                        <option value="置顶">📌 置顶</option>
                         <option value="未分类">未分类</option>
-                        <!-- JS 动态填充其他分类 -->
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="form-label">简短描述</label>
-                <input type="text" id="newDesc" class="form-input" placeholder="一句话介绍...">
-            </div>
-            <button class="btn btn-primary" onclick="addSite()">立即添加</button>
+            <button class="btn btn-primary" id="addBtn" onclick="addSiteWithCheck()">
+                <span id="addBtnText">添加并检测</span>
+            </button>
         </div>
 
         <div class="import-area">
-            <div class="import-text">📂 自动识别分类导入</div>
+            <div class="import-text">📂 批量导入并自动检测</div>
             <p style="font-size: 12px; color: #15803d; margin: 0 0 10px 0;">
-                系统将自动读取书签文件中的<strong>文件夹名称</strong>作为分类标签。<br>
-                若想设为置顶，请在浏览器中将书签放入名为 "置顶" 的文件夹，或导入后手动修改。
+                支持识别文件夹分类。<br>
+                <strong>内网/IP 链接</strong>将直接添加；<strong>外网链接</strong>将尝试获取标题并检测可用性。
             </p>
-            <button class="btn btn-success" onclick="document.getElementById('bookmarkFileInput').click()">
-                选择书签 HTML 文件
+            <button class="btn btn-success" id="importBtn" onclick="document.getElementById('bookmarkFileInput').click()">
+                选择书签文件
             </button>
             <input type="file" id="bookmarkFileInput" accept=".html,.htm" style="display:none" onchange="handleFileSelect(this)">
-            <div id="importStatus" style="font-size: 12px; margin-top: 8px; color: #166534; min-height: 18px;"></div>
+            
+            <div id="importLog" class="log-box" style="display:none;"></div>
         </div>
 
         <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn btn-warning" onclick="resetData()">⚠️ 重置默认列表</button>
-            <button class="btn btn-secondary" onclick="toggleAdminMode()">关闭面板</button>
+            <button class="btn btn-warning" onclick="resetData()">⚠️ 重置</button>
+            <button class="btn btn-secondary" onclick="toggleAdminMode()">关闭</button>
         </div>
     </div>
 
-    <!-- 网站列表 -->
     <div id="siteGrid" class="grid"></div>
 </div>
 
-<!-- 登录模态框 -->
 <div id="loginModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; font-size: 20px;">管理员验证</h3>
-        <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 20px;">请输入密码以编辑内容</p>
-        <input type="password" id="adminPassword" class="form-input" placeholder="密码" style="margin-bottom: 20px; text-align: center; font-size: 16px;">
+        <h3 style="margin-top:0;">管理员验证</h3>
+        <input type="password" id="adminPassword" class="form-input" placeholder="密码" style="margin: 20px 0; text-align: center;">
         <div style="display: flex; gap: 10px; justify-content: center;">
             <button class="btn btn-primary" style="flex: 1;" onclick="checkPassword()">登录</button>
             <button class="btn btn-secondary" style="flex: 1;" onclick="closeLogin()">取消</button>
@@ -384,24 +376,22 @@
 </div>
 
 <script>
-    // ================= 配置 =================
     const ADMIN_PASSWORD = "618033";
     
-    // 默认数据 (已更新为您提供的列表，并标记为 "置顶")
     const defaultSites = [
         { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型", category: "置顶" },
         { name: "Gemini", url: "https://ai.google/", desc: "Google Ai", category: "置顶" },
         { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai", category: "置顶" },
         { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具", category: "置顶" },
         { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员", category: "置顶" },
-        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集", category: "置顶" },
+        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽", category: "置顶" },
         { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎", category: "置顶" },
-        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手", category: "置顶" },
+        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全 AI 助手", category: "置顶" },
         { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型", category: "置顶" },
-        { name: "千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶" },
+        { name: "通义千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶" },
         { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型", category: "置顶" },
         { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型", category: "置顶" },
-        { name: "元宝", url: "https://yuanbao.tencent.com/", desc: "腾讯旗下大语言模型", category: "置顶" },
+        { name: "腾讯元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型", category: "置顶" },
         { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型", category: "置顶" },
         { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型", category: "置顶" },
         { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成", category: "置顶" }
@@ -409,27 +399,19 @@
 
     let sites = [];
     let isAdmin = false;
-    let currentCategory = "全部"; // 默认显示全部（实际上会优先展示置顶）
+    let currentCategory = "全部";
 
-    // 初始化
     window.onload = function() {
         loadSites();
         renderTabs();
         renderSites();
-        
-        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') checkPassword();
-        });
+        document.getElementById('adminPassword').addEventListener('keypress', e => { if(e.key==='Enter') checkPassword(); });
     };
 
     function loadSites() {
         const stored = localStorage.getItem('ai_nav_sites');
-        if (stored) {
-            sites = JSON.parse(stored);
-        } else {
-            sites = [...defaultSites];
-            saveSites();
-        }
+        sites = stored ? JSON.parse(stored) : [...defaultSites];
+        if(!stored) saveSites();
     }
 
     function saveSites() {
@@ -439,254 +421,291 @@
     }
 
     function resetData() {
-        if(confirm("确定要清空所有自定义内容，恢复为初始默认列表（含置顶数据）吗？")) {
+        if(confirm("确定重置？")) {
             localStorage.removeItem('ai_nav_sites');
             sites = [...defaultSites];
             currentCategory = "全部";
             saveSites();
-            document.getElementById('importStatus').innerText = "已重置为默认列表";
-            setTimeout(() => document.getElementById('importStatus').innerText = "", 3000);
+            alert("已重置");
         }
     }
 
-    // 获取所有唯一分类
     function getCategories() {
         const cats = new Set(sites.map(s => s.category || "未分类"));
-        // 确保 "置顶" 和 "全部" 在列表中
         return ["全部", "置顶", ...Array.from(cats).filter(c => c !== "置顶" && c !== "全部").sort()];
     }
 
-    // 渲染分类选项卡
     function renderTabs() {
         const container = document.getElementById('tabsContainer');
         const categories = getCategories();
         container.innerHTML = '';
-
         categories.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = `tab-btn ${cat === currentCategory ? 'active' : ''}`;
             btn.innerText = cat === "置顶" ? "📌 置顶" : cat;
-            btn.onclick = () => {
-                currentCategory = cat;
-                renderTabs();
-                renderSites();
-                if(window.scrollY > 200) window.scrollTo({top: 0, behavior: 'smooth'});
-            };
+            btn.onclick = () => { currentCategory = cat; renderTabs(); renderSites(); };
             container.appendChild(btn);
         });
 
-        // 更新手动添加时的下拉框
         const select = document.getElementById('newCategory');
         const currentVal = select.value;
-        // 保留 "置顶" 和 "未分类"，动态添加其他
-        let optionsHtml = '<option value="置顶">📌 置顶 (首页优先)</option><option value="未分类">未分类</option>';
-        categories.filter(c => c !== "全部" && c !== "置顶" && c !== "未分类").forEach(cat => {
-            optionsHtml += `<option value="${cat}">${cat}</option>`;
-        });
-        select.innerHTML = optionsHtml;
-        
+        let opts = '<option value="置顶">📌 置顶</option><option value="未分类">未分类</option>';
+        categories.filter(c => !["全部","置顶","未分类"].includes(c)).forEach(c => opts += `<option value="${c}">${c}</option>`);
+        select.innerHTML = opts;
         if(currentVal && categories.includes(currentVal)) select.value = currentVal;
-        else select.value = "置顶"; // 默认新添加的也建议选置顶或未分类
     }
 
     function renderSites(filterText = '') {
         const grid = document.getElementById('siteGrid');
         grid.innerHTML = '';
-
-        // 过滤逻辑
         let filtered = sites.filter(site => {
             const siteCat = site.category || "未分类";
             const matchCat = currentCategory === "全部" || siteCat === currentCategory;
             const text = (filterText || '').toLowerCase();
-            const matchText = !text || 
-                site.name.toLowerCase().includes(text) || 
-                (site.desc || '').toLowerCase().includes(text) ||
-                siteCat.toLowerCase().includes(text);
+            const matchText = !text || site.name.toLowerCase().includes(text) || (site.desc||'').toLowerCase().includes(text);
             return matchCat && matchText;
         });
 
-        // 特殊逻辑：如果在 "全部" 模式下，我们想让用户一眼看到置顶的
-        // 但目前逻辑是 Tabs 切换，如果用户在 "全部"，显示所有。
-        // 如果用户想在 "全部" 里把置顶的放最前面，可以加一个排序
         if (currentCategory === "全部") {
-            filtered.sort((a, b) => {
-                const aIsTop = (a.category === "置顶");
-                const bIsTop = (b.category === "置顶");
-                if (aIsTop && !bIsTop) return -1;
-                if (!aIsTop && bIsTop) return 1;
-                return 0;
-            });
+            filtered.sort((a, b) => (b.category === "置顶") - (a.category === "置顶"));
         }
 
-        if (filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-sub); background: rgba(255,255,255,0.5); border-radius: 16px;">
-                <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
-                ${currentCategory === "全部" ? "没有找到相关工具" : `"${currentCategory}" 分类下暂无内容`}
-            </div>`;
+        if (!filtered.length) {
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-sub); background:rgba(255,255,255,0.6); border-radius:16px;">暂无内容</div>`;
             return;
         }
 
         filtered.forEach(site => {
-            const originalIndex = sites.indexOf(site);
+            const idx = sites.indexOf(site);
             const initial = site.name.trim().charAt(0).toUpperCase() || '?';
-            const cat = site.category || "未分类";
-            
+            const statusBadge = site.status ? 
+                (site.status === 'ok' ? '<span class="status-badge status-ok">可用</span>' : 
+                 site.status === 'warn' ? '<span class="status-badge status-warn">存疑</span>' : 
+                 '<span class="status-badge status-err">不可达</span>') : '';
+
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <button class="delete-btn" onclick="deleteSite(${originalIndex})" ${isAdmin ? 'style="display:flex"' : ''}>×</button>
+                <button class="delete-btn" onclick="deleteSite(${idx})" ${isAdmin?'style="display:flex"':''}>×</button>
                 <div class="card-top">
                     <div class="card-icon">${initial}</div>
                     <div class="card-info">
-                        <a href="${site.url}" target="_blank" class="card-title" title="${site.name}">${site.name}</a>
-                        <div class="card-desc" title="${site.desc}">${site.desc || '暂无描述'}</div>
-                        ${currentCategory === "全部" && cat === "置顶" ? '' : (currentCategory === "全部" ? `<span class="card-tag">${cat}</span>` : '')}
+                        <a href="${site.url}" target="_blank" class="card-title">${site.name} ${statusBadge}</a>
+                        <div class="card-desc">${site.desc || '暂无描述'}</div>
+                        ${currentCategory==="全部" && site.category!=="置顶" ? `<span class="card-tag">${site.category}</span>` : ''}
                     </div>
                 </div>
-                <div class="btn-visit-wrapper" style="margin-top:auto; padding-top:15px;">
-                    <a href="${site.url}" target="_blank" class="btn-visit">立即访问 →</a>
-                </div>
+                <a href="${site.url}" target="_blank" class="btn-visit">立即访问 →</a>
             `;
             grid.appendChild(card);
         });
     }
 
-    function filterSites() {
-        renderSites(document.getElementById('searchInput').value);
-    }
+    function filterSites() { renderSites(document.getElementById('searchInput').value); }
 
     // === 管理逻辑 ===
-    function showLogin() {
-        if (isAdmin) { toggleAdminMode(); } 
-        else {
-            document.getElementById('loginModal').style.display = 'flex';
-            document.getElementById('adminPassword').focus();
-        }
-    }
-
-    function closeLogin() {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('adminPassword').value = '';
-    }
-
+    function showLogin() { isAdmin ? toggleAdminMode() : (document.getElementById('loginModal').style.display='flex'); }
+    function closeLogin() { document.getElementById('loginModal').style.display='none'; document.getElementById('adminPassword').value=''; }
     function checkPassword() {
-        if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
-            isAdmin = true;
-            closeLogin();
-            document.getElementById('adminPanel').style.display = 'block';
-            renderTabs();
-            renderSites();
-            document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
-        } else {
-            alert("密码错误");
-        }
+        if(document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+            isAdmin = true; closeLogin();
+            document.getElementById('adminPanel').style.display='block';
+            renderTabs(); renderSites();
+        } else alert("密码错误");
     }
-
     function toggleAdminMode() {
-        const panel = document.getElementById('adminPanel');
-        if (panel.style.display === 'block') {
-            panel.style.display = 'none';
-            isAdmin = false;
-            renderSites();
-        } else {
-            if(isAdmin) panel.style.display = 'block';
-        }
+        const p = document.getElementById('adminPanel');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        if(p.style.display==='none') { isAdmin=false; renderSites(); }
+    }
+    function deleteSite(i) { if(confirm("确定删除?")) { sites.splice(i,1); saveSites(); } }
+
+    // === 核心检测逻辑 ===
+    
+    // 判断是否为内网/IP
+    function isInternal(url) {
+        try {
+            const hostname = new URL(url).hostname;
+            if(hostname === 'localhost' || hostname === '127.0.0.1') return true;
+            // IPv4 简单正则
+            const ipRegex = /^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|0\.0\.0\.0)/;
+            if(ipRegex.test(hostname)) return true;
+            return false;
+        } catch(e) { return false; }
     }
 
-    function addSite() {
-        const name = document.getElementById('newName').value.trim();
-        const url = document.getElementById('newUrl').value.trim();
-        const desc = document.getElementById('newDesc').value.trim();
-        const category = document.getElementById('newCategory').value;
+    // 检测单个网站
+    async function checkSiteHealth(url, providedName, providedDesc) {
+        const result = { name: providedName, desc: providedDesc, status: 'ok', url: url };
 
-        if (!name || !url) { alert("请填写名称和链接"); return; }
-
-        let finalUrl = url;
-        if (!/^https?:\/\//i.test(url)) finalUrl = 'https://' + url;
-
-        if (sites.some(s => s.url === finalUrl)) {
-            alert("该网址已存在！");
-            return;
+        // 1. 内网/IP 直接跳过检测
+        if(isInternal(url)) {
+            console.log(`跳过内网检测: ${url}`);
+            if(!result.name) result.name = "内网服务";
+            if(!result.desc) result.desc = "本地或内网链接，已自动添加";
+            return result;
         }
 
-        sites.unshift({ name, url: finalUrl, desc: desc || '暂无描述', category });
+        // 2. 外网检测：使用 allorigins 代理获取 HTML
+        try {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            
+            if(!data.contents) throw new Error("No content");
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.contents, "text/html");
+            
+            // 获取 Title
+            const title = doc.querySelector('title');
+            if(title && title.textContent.trim() && !providedName) {
+                result.name = title.textContent.trim();
+            } else if (!providedName) {
+                result.name = new URL(url).hostname;
+            }
+
+            // 获取 Description
+            const metaDesc = doc.querySelector('meta[name="description"]');
+            if(metaDesc && metaDesc.content.trim() && !providedDesc) {
+                result.desc = metaDesc.content.trim();
+            } else if (!providedDesc) {
+                result.desc = "自动添加的外网链接";
+            }
+
+            result.status = 'ok';
+        } catch (error) {
+            console.warn(`检测失败 ${url}:`, error);
+            result.status = 'warn'; // 标记为存疑，但保留
+            if(!providedName) result.name = new URL(url).hostname;
+            if(!providedDesc) result.desc = "无法自动获取描述 (可能网络受限或跨域拦截)，已保留链接";
+        }
+        return result;
+    }
+
+    // 手动添加带检测
+    async function addSiteWithCheck() {
+        const nameIn = document.getElementById('newName').value.trim();
+        const urlIn = document.getElementById('newUrl').value.trim();
+        const descIn = document.getElementById('newDesc').value.trim();
+        const catIn = document.getElementById('newCategory').value;
+        const btn = document.getElementById('addBtn');
+        const btnText = document.getElementById('addBtnText');
+
+        if(!urlIn) { alert("请输入网址"); return; }
+        let finalUrl = urlIn.startsWith('http') ? urlIn : 'https://' + urlIn;
+
+        if(sites.some(s => s.url === finalUrl)) { alert("已存在"); return; }
+
+        // UI Loading
+        const originalText = btnText.innerText;
+        btnText.innerText = "检测中...";
+        btn.disabled = true;
+
+        const siteData = await checkSiteHealth(finalUrl, nameIn, descIn);
+        
+        sites.unshift({ ...siteData, category: catIn });
         saveSites();
-        
-        ['newName', 'newUrl', 'newDesc'].forEach(id => document.getElementById(id).value = '');
-        alert("添加成功！");
-    }
 
-    function deleteSite(index) {
-        if(confirm(`确定删除 "${sites[index].name}" 吗？`)) {
-            sites.splice(index, 1);
-            saveSites();
+        // Reset Form
+        document.getElementById('newName').value = '';
+        document.getElementById('newUrl').value = '';
+        document.getElementById('newDesc').value = '';
+        
+        btnText.innerText = originalText;
+        btn.disabled = false;
+
+        if(siteData.status === 'warn') {
+            alert(`添加成功，但检测到该链接可能不可达或获取信息失败。\n名称：${siteData.name}\n状态：存疑 (已保留)`);
+        } else {
+            // alert("添加成功!"); // 静默成功体验更好
         }
     }
 
-    // === 书签导入逻辑 (支持识别 "置顶" 文件夹) ===
-    function handleFileSelect(input) {
+    // 批量导入带检测
+    async function handleFileSelect(input) {
         const file = input.files[0];
-        if (!file) return;
+        if(!file) return;
 
-        const statusDiv = document.getElementById('importStatus');
-        statusDiv.innerText = "正在解析文件并提取分类...";
-        
+        const logBox = document.getElementById('importLog');
+        const importBtn = document.getElementById('importBtn');
+        logBox.style.display = 'block';
+        logBox.innerHTML = '<div class="log-item"><span class="spinner"></span> 开始解析文件...</div>';
+        importBtn.disabled = true;
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(e.target.result, "text/html");
+            const dtElements = doc.querySelectorAll('dt');
             
             let currentFolder = "未分类";
             let count = 0;
             let skip = 0;
+            let processed = 0;
+            const total = dtElements.length; // 粗略估计
 
-            const dtElements = doc.querySelectorAll('dt');
-            
-            dtElements.forEach(dt => {
+            logBox.innerHTML = `<div class="log-item">📂 发现约 ${total} 个条目，开始逐个检测...</div>`;
+
+            // 为了不阻塞 UI，分批次处理或使用 async/await 循环
+            // 注意：频繁请求公共代理可能会触发限流，这里加一点延迟
+            for(let dt of dtElements) {
                 const h3 = dt.querySelector('h3');
                 const a = dt.querySelector('a');
 
-                if (h3) {
-                    let folderName = h3.textContent.trim() || "未分类";
-                    folderName = folderName.replace(/[<>"/]/g, '');
-                    // 如果文件夹名叫 "置顶" 或 "Top" 或 "Star"，自动归类为 "置顶"
-                    if (["置顶", "Top", "Star", "Favorites", "收藏"].includes(folderName)) {
-                        currentFolder = "置顶";
-                    } else {
-                        currentFolder = folderName;
-                    }
-                } else if (a) {
+                if(h3) {
+                    let fName = h3.textContent.trim() || "未分类";
+                    fName = fName.replace(/[<>"/]/g, '');
+                    currentFolder = ["置顶","Top","Star"].includes(fName) ? "置顶" : fName;
+                    continue;
+                }
+
+                if(a) {
                     const url = a.getAttribute('href');
-                    const name = a.textContent.trim() || "未命名";
+                    const name = a.textContent.trim();
+                    if(!url || url.startsWith('#')) continue;
+                    if(sites.some(s => s.url === url)) { skip++; continue; }
+
+                    processed++;
+                    logBox.innerHTML += `<div class="log-item">⏳ 检测 (${processed}): ${name || url}...</div>`;
+                    logBox.scrollTop = logBox.scrollHeight;
+
+                    // 执行检测
+                    const siteData = await checkSiteHealth(url, name, "");
                     
-                    if (!url || url.startsWith("#") || url.startsWith("javascript:")) return;
-                    if (sites.some(s => s.url === url)) { skip++; return; }
-
-                    sites.unshift({
-                        name: name,
-                        url: url,
-                        desc: "来自书签导入",
-                        category: currentFolder
-                    });
+                    sites.unshift({ ...siteData, category: currentFolder });
                     count++;
-                }
-            });
 
-            if (count > 0) {
-                saveSites();
-                statusDiv.innerHTML = `<span style="color:#166534">✅ 成功导入 <b>${count}</b> 个网址 (跳过 ${skip} 个重复)。</span>`;
-                if(currentCategory !== "全部") {
-                    currentCategory = "全部";
-                    renderTabs();
-                    renderSites();
+                    // 更新日志状态
+                    const lastLog = logBox.lastElementChild;
+                    if(siteData.status === 'ok') {
+                        lastLog.innerHTML = `✅ <b>${siteData.name}</b> - 可用`;
+                        lastLog.style.color = '#166534';
+                    } else {
+                        lastLog.innerHTML = `⚠️ <b>${siteData.name}</b> - 存疑/不可达 (已保留)`;
+                        lastLog.style.color = '#92400e';
+                    }
+                    
+                    // 每处理 5 个保存一次，防止崩溃
+                    if(count % 5 === 0) saveSites();
+                    
+                    // 简单的防限流延迟 (200ms)
+                    await new Promise(r => setTimeout(r, 200));
                 }
-            } else {
-                statusDiv.innerHTML = `<span style="color:#ef4444">未找到新网址。</span>`;
             }
-            input.value = ''; 
+
+            saveSites();
+            logBox.innerHTML += `<div class="log-item" style="margin-top:10px; font-weight:bold; border-top:1px solid #ccc; padding-top:5px;">
+                🎉 完成! 导入 ${count} 个新网址，跳过 ${skip} 个重复项。
+            </div>`;
+            importBtn.disabled = false;
+            renderTabs();
+            renderSites();
+            input.value = '';
         };
         reader.readAsText(file);
     }
+
 </script>
 <div style="text-align: center;"> 
     <a href="//1.618033.com" style="color:#8C8C8C;" target="_blank">© ♾️</a>
