@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AINav</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta content="telephone=no,email=no" name="format-detection">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta name="apple-touch-fullscreen" content="yes" />
+	<meta name="keywords" content="AI,1.618033,AINav,Ai导航" />
+	<meta name="description" content="Sex，life goes on。" />
+	<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/2352309?v=4&size=40">
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/yidong.css" />
+	<script>document.addEventListener('visibilitychange',function(){if(document.visibilityState=='hidden'){normal_title=document.title;document.title='漫游中…';}else{document.title=normal_title;}});</script>
+</head>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -276,11 +288,19 @@
     // 默认数据 (如果本地没有数据则加载这些)
     const defaultSites = [
         { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型" },
+        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai" },
+        { name: "Grok", url: "https://Grok.com", desc: "马斯克旗下Ai" },
         { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具" },
         { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员" },
         { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集" },
         { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎" },
         { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手" }
+        { name: "deepseek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型" },
+        { name: "千问", url: "https://qianwen.com", desc: "阿里巴巴旗下大语言模型" },
+        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型" },
+        { name: "lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型" },
+        { name: "元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型" },
+        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型" },
     ];
 
     let sites = [];
@@ -333,7 +353,7 @@
                     <a href="${site.url}" target="_blank" class="card-title">${site.name}</a>
                 </div>
                 <div class="card-desc">${site.desc}</div>
-                <a href="${site.url}" target="_blank" class="card-link">访问网站 →</a>
+                <a href="${site.url}" target="_blank" class="card-link">去访问 →</a>
             `;
             grid.appendChild(card);
         });
