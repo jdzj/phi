@@ -12,11 +12,11 @@
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.9); /* 卡片半透明 */
+            --bg-panel: rgba(255, 255, 255, 0.95);
             --text-main: #0f172a;
             --text-sub: #64748b;
-            --border: #e2e8f0;
+            --border: rgba(226, 232, 240, 0.8);
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             --radius: 16px;
@@ -28,22 +28,38 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             line-height: 1.5;
+            /* 背景图设置 */
+            background-image: url('https://bing.ee123.net/dayimg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* 固定背景，滚动时内容浮动 */
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        /* 全局遮罩，确保文字清晰度 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(248, 250, 252, 0.85); /* 白色半透明蒙版 */
+            z-index: -1;
+            backdrop-filter: blur(5px); /* 轻微模糊背景图 */
         }
 
         /* 头部 */
         .header {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.8);
             padding: 30px 20px 20px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border);
             transition: all 0.3s;
         }
@@ -56,6 +72,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            color: var(--text-main);
         }
         .logo span { color: var(--primary); }
 
@@ -71,12 +88,14 @@
             border: 2px solid var(--border);
             border-radius: 50px;
             font-size: 15px;
-            background: #fff;
+            background: rgba(255, 255, 255, 0.9);
             transition: all 0.2s;
+            color: var(--text-main);
         }
         .search-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
         .search-icon {
             position: absolute;
@@ -85,6 +104,7 @@
             transform: translateY(-50%);
             color: var(--text-sub);
             cursor: pointer;
+            font-size: 18px;
         }
 
         /* 分类选项卡 */
@@ -95,7 +115,7 @@
             white-space: nowrap;
             padding-bottom: 5px;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .tabs-container::-webkit-scrollbar { display: none; }
 
@@ -107,21 +127,38 @@
             font-size: 14px;
             font-weight: 500;
             color: var(--text-sub);
-            background: #fff;
+            background: rgba(255, 255, 255, 0.6);
             border: 1px solid var(--border);
             cursor: pointer;
             transition: all 0.2s;
         }
-        .tab-btn:hover { background: #f1f5f9; }
+        .tab-btn:hover { background: rgba(255, 255, 255, 0.9); }
         .tab-btn.active {
             background: var(--tab-active-bg);
             color: var(--tab-active-text);
             border-color: var(--tab-active-text);
             font-weight: 600;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
         }
 
-        /* 网格 */
+        /* 容器与网格 */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* 置顶区域特殊样式 (可选，这里保持统一但可以通过标题区分) */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 30px 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::before {
+            content: '📌';
+            font-size: 20px;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -139,12 +176,14 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            border: 1px solid transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(5px);
         }
         .card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-hover);
-            border-color: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.3);
+            background: rgba(255, 255, 255, 0.95);
         }
         
         .card-top { display: flex; align-items: flex-start; margin-bottom: 12px; }
@@ -180,7 +219,7 @@
             margin-top: auto; padding-top: 15px;
             display: block; width: 100%;
             padding: 10px; text-align: center;
-            background: #f8fafc; color: var(--text-main);
+            background: rgba(248, 250, 252, 0.8); color: var(--text-main);
             text-decoration: none; border-radius: 8px;
             font-size: 14px; font-weight: 500;
             transition: all 0.2s;
@@ -194,16 +233,19 @@
             border: none; border-radius: 50%;
             display: none; align-items: center; justify-content: center;
             cursor: pointer; font-size: 14px;
+            z-index: 10;
         }
 
         /* 管理面板 */
         .admin-panel {
-            display: none; background: #fff;
+            display: none; 
+            background: var(--bg-panel);
             border-radius: var(--radius);
             padding: 25px; margin: 20px auto;
             max-width: 600px;
             box-shadow: var(--shadow-hover);
             border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
         }
         .panel-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
         .form-group { margin-bottom: 15px; }
@@ -211,7 +253,8 @@
         .form-input, .form-select {
             width: 100%; padding: 10px;
             border: 1px solid var(--border); border-radius: 8px;
-            font-size: 14px; background: #fff;
+            font-size: 14px; background: rgba(255,255,255,0.8);
+            color: var(--text-main);
         }
         .form-row { display: flex; gap: 10px; }
         .form-row .form-group { flex: 1; }
@@ -229,7 +272,8 @@
         .btn-secondary { background: #e2e8f0; color: var(--text-main); }
 
         .import-area {
-            background: #f0fdf4; border: 1px dashed #86efac;
+            background: rgba(240, 253, 244, 0.8); 
+            border: 1px dashed #86efac;
             border-radius: 8px; padding: 15px; text-align: center;
             margin-top: 20px;
         }
@@ -238,7 +282,7 @@
         /* 模态框 */
         .modal {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
             z-index: 1000; align-items: center; justify-content: center;
         }
         .modal-content {
@@ -262,8 +306,8 @@
     <div class="logo"><span>⚡</span> AINav</div>
     
     <div class="search-box">
-        <input type="text" id="searchInput" class="search-input" placeholder="搜索工具、描述或分类..." onkeyup="filterSites()">
-        <span class="search-icon" onclick="showLogin()">⚙️</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeyup="filterSites()">
+        <span class="search-icon" onclick="showLogin()" title="♾️">⚙️</span>
     </div>
 
     <!-- 分类选项卡 -->
@@ -277,7 +321,7 @@
     <div id="adminPanel" class="admin-panel">
         <div class="panel-title">➕ 管理中心</div>
         
-        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+        <div style="background: rgba(248, 250, 252, 0.6); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
             <div class="form-group">
                 <label class="form-label">网站名称</label>
                 <input type="text" id="newName" class="form-input" placeholder="例如：ChatGPT">
@@ -290,8 +334,9 @@
                 <div class="form-group" style="flex: 1.5;">
                     <label class="form-label">所属分类</label>
                     <select id="newCategory" class="form-select">
+                        <option value="置顶">📌 置顶 (首页优先)</option>
                         <option value="未分类">未分类</option>
-                        <!-- JS 动态填充现有分类 -->
+                        <!-- JS 动态填充其他分类 -->
                     </select>
                 </div>
             </div>
@@ -305,7 +350,8 @@
         <div class="import-area">
             <div class="import-text">📂 自动识别分类导入</div>
             <p style="font-size: 12px; color: #15803d; margin: 0 0 10px 0;">
-                系统将自动读取书签文件中的<strong>文件夹名称</strong>作为分类标签。
+                系统将自动读取书签文件中的<strong>文件夹名称</strong>作为分类标签。<br>
+                若想设为置顶，请在浏览器中将书签放入名为 "置顶" 的文件夹，或导入后手动修改。
             </p>
             <button class="btn btn-success" onclick="document.getElementById('bookmarkFileInput').click()">
                 选择书签 HTML 文件
@@ -341,29 +387,29 @@
     // ================= 配置 =================
     const ADMIN_PASSWORD = "618033";
     
-    // 默认数据 (包含 category 字段)
+    // 默认数据 (已更新为您提供的列表，并标记为 "置顶")
     const defaultSites = [
-        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型" , category: "对话助手" },
-        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai", category: "对话助手"  },
-        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai " , category: "对话助手" },
-        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具" },
-        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员" },
-        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集" },
-        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎" },
-        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手" },
-        { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型" },
-        { name: "通义千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型 " },
-        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型" },
-        { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型" },
-        { name: "腾讯元宝", url: "https://hunyuan.tencent.com/", desc: "腾讯开发的强大语言模型" },
-        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型" },
-        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型" },
-        { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成" }
+        { name: "ChatGPT", url: "https://chat.openai.com", desc: "OpenAI 开发的强大语言模型", category: "置顶" },
+        { name: "Gemini", url: "https://ai.google/", desc: "Google Ai", category: "置顶" },
+        { name: "Grok", url: "https://grok.com", desc: "马斯克旗下 Ai", category: "置顶" },
+        { name: "Midjourney", url: "https://www.midjourney.com", desc: "领先的 AI 绘画生成工具", category: "置顶" },
+        { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "您的 AI 结对程序员", category: "置顶" },
+        { name: "Hugging Face", url: "https://huggingface.co", desc: "AI 社区的枢纽，模型与数据集", category: "置顶" },
+        { name: "Perplexity", url: "https://www.perplexity.ai", desc: "AI 驱动的搜索引擎", category: "置顶" },
+        { name: "Claude", url: "https://claude.ai", desc: "Anthropic 出品的安全有用 AI 助手", category: "置顶" },
+        { name: "DeepSeek", url: "https://www.deepseek.com/", desc: "深度求索大语言模型", category: "置顶" },
+        { name: "千问", url: "https://www.qianwen.com/", desc: "阿里巴巴旗下大语言模型", category: "置顶" },
+        { name: "Kimi", url: "https://kimi.moonshot.cn/", desc: "月之暗面开发的强大语言模型", category: "置顶" },
+        { name: "Lovart", url: "https://www.lovart.ai/", desc: "生图不错的大语言模型", category: "置顶" },
+        { name: "元宝", url: "https://yuanbao.tencent.com/", desc: "腾讯旗下大语言模型", category: "置顶" },
+        { name: "即梦", url: "https://jimeng.jianying.com/", desc: "剪映开发的强大语言模型", category: "置顶" },
+        { name: "Sora", url: "https://openai.com/sora", desc: "OpenAI 视频生成模型", category: "置顶" },
+        { name: "Sunoo", url: "https://suno.com", desc: "AI 音乐生成", category: "置顶" }
     ];
 
     let sites = [];
     let isAdmin = false;
-    let currentCategory = "全部"; // 当前选中的分类
+    let currentCategory = "全部"; // 默认显示全部（实际上会优先展示置顶）
 
     // 初始化
     window.onload = function() {
@@ -388,12 +434,12 @@
 
     function saveSites() {
         localStorage.setItem('ai_nav_sites', JSON.stringify(sites));
-        renderTabs(); // 保存后重新渲染分类标签
+        renderTabs();
         renderSites();
     }
 
     function resetData() {
-        if(confirm("确定要清空所有自定义内容和分类，恢复为初始默认列表吗？")) {
+        if(confirm("确定要清空所有自定义内容，恢复为初始默认列表（含置顶数据）吗？")) {
             localStorage.removeItem('ai_nav_sites');
             sites = [...defaultSites];
             currentCategory = "全部";
@@ -406,7 +452,8 @@
     // 获取所有唯一分类
     function getCategories() {
         const cats = new Set(sites.map(s => s.category || "未分类"));
-        return ["全部", ...Array.from(cats).sort()];
+        // 确保 "置顶" 和 "全部" 在列表中
+        return ["全部", "置顶", ...Array.from(cats).filter(c => c !== "置顶" && c !== "全部").sort()];
     }
 
     // 渲染分类选项卡
@@ -418,12 +465,11 @@
         categories.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = `tab-btn ${cat === currentCategory ? 'active' : ''}`;
-            btn.innerText = cat;
+            btn.innerText = cat === "置顶" ? "📌 置顶" : cat;
             btn.onclick = () => {
                 currentCategory = cat;
-                renderTabs(); // 更新激活状态
-                renderSites(); // 过滤显示
-                // 滚动到顶部确保可见
+                renderTabs();
+                renderSites();
                 if(window.scrollY > 200) window.scrollTo({top: 0, behavior: 'smooth'});
             };
             container.appendChild(btn);
@@ -432,34 +478,48 @@
         // 更新手动添加时的下拉框
         const select = document.getElementById('newCategory');
         const currentVal = select.value;
-        select.innerHTML = '';
-        categories.filter(c => c !== "全部").forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat;
-            opt.innerText = cat;
-            select.appendChild(opt);
+        // 保留 "置顶" 和 "未分类"，动态添加其他
+        let optionsHtml = '<option value="置顶">📌 置顶 (首页优先)</option><option value="未分类">未分类</option>';
+        categories.filter(c => c !== "全部" && c !== "置顶" && c !== "未分类").forEach(cat => {
+            optionsHtml += `<option value="${cat}">${cat}</option>`;
         });
+        select.innerHTML = optionsHtml;
+        
         if(currentVal && categories.includes(currentVal)) select.value = currentVal;
-        else if(categories.length > 1) select.value = categories[1]; // 默认选第一个非"全部"
+        else select.value = "置顶"; // 默认新添加的也建议选置顶或未分类
     }
 
     function renderSites(filterText = '') {
         const grid = document.getElementById('siteGrid');
         grid.innerHTML = '';
 
-        // 双重过滤：先按分类，再按搜索词
-        const filtered = sites.filter(site => {
-            const matchCat = currentCategory === "全部" || (site.category || "未分类") === currentCategory;
+        // 过滤逻辑
+        let filtered = sites.filter(site => {
+            const siteCat = site.category || "未分类";
+            const matchCat = currentCategory === "全部" || siteCat === currentCategory;
             const text = (filterText || '').toLowerCase();
             const matchText = !text || 
                 site.name.toLowerCase().includes(text) || 
                 (site.desc || '').toLowerCase().includes(text) ||
-                (site.category || '').toLowerCase().includes(text);
+                siteCat.toLowerCase().includes(text);
             return matchCat && matchText;
         });
 
+        // 特殊逻辑：如果在 "全部" 模式下，我们想让用户一眼看到置顶的
+        // 但目前逻辑是 Tabs 切换，如果用户在 "全部"，显示所有。
+        // 如果用户想在 "全部" 里把置顶的放最前面，可以加一个排序
+        if (currentCategory === "全部") {
+            filtered.sort((a, b) => {
+                const aIsTop = (a.category === "置顶");
+                const bIsTop = (b.category === "置顶");
+                if (aIsTop && !bIsTop) return -1;
+                if (!aIsTop && bIsTop) return 1;
+                return 0;
+            });
+        }
+
         if (filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-sub);">
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-sub); background: rgba(255,255,255,0.5); border-radius: 16px;">
                 <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
                 ${currentCategory === "全部" ? "没有找到相关工具" : `"${currentCategory}" 分类下暂无内容`}
             </div>`;
@@ -480,7 +540,7 @@
                     <div class="card-info">
                         <a href="${site.url}" target="_blank" class="card-title" title="${site.name}">${site.name}</a>
                         <div class="card-desc" title="${site.desc}">${site.desc || '暂无描述'}</div>
-                        ${currentCategory === "全部" ? `<span class="card-tag">${cat}</span>` : ''}
+                        ${currentCategory === "全部" && cat === "置顶" ? '' : (currentCategory === "全部" ? `<span class="card-tag">${cat}</span>` : '')}
                     </div>
                 </div>
                 <div class="btn-visit-wrapper" style="margin-top:auto; padding-top:15px;">
@@ -514,7 +574,7 @@
             isAdmin = true;
             closeLogin();
             document.getElementById('adminPanel').style.display = 'block';
-            renderTabs(); // 刷新下拉框
+            renderTabs();
             renderSites();
             document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
         } else {
@@ -527,7 +587,7 @@
         if (panel.style.display === 'block') {
             panel.style.display = 'none';
             isAdmin = false;
-            renderSites(); // 隐藏删除按钮
+            renderSites();
         } else {
             if(isAdmin) panel.style.display = 'block';
         }
@@ -563,7 +623,7 @@
         }
     }
 
-    // === 核心：带分类的书签导入逻辑 ===
+    // === 书签导入逻辑 (支持识别 "置顶" 文件夹) ===
     function handleFileSelect(input) {
         const file = input.files[0];
         if (!file) return;
@@ -580,13 +640,6 @@
             let count = 0;
             let skip = 0;
 
-            // 遍历所有节点
-            const allNodes = doc.querySelectorAll('dt, h3, a');
-            
-            // 简单的状态机逻辑解析 Netscape Bookmark 格式
-            // 格式通常是: <DT><H3>文件夹名</H3> ... <DT><A>链接</A> ... </DL>
-            // 我们采用更稳健的方式：查找所有的 H3 作为新分类的开始，直到下一个 H3
-            
             const dtElements = doc.querySelectorAll('dt');
             
             dtElements.forEach(dt => {
@@ -594,12 +647,15 @@
                 const a = dt.querySelector('a');
 
                 if (h3) {
-                    // 发现新分类
-                    currentFolder = h3.textContent.trim() || "未分类";
-                    // 清理特殊字符
-                    currentFolder = currentFolder.replace(/[<>"/]/g, '');
+                    let folderName = h3.textContent.trim() || "未分类";
+                    folderName = folderName.replace(/[<>"/]/g, '');
+                    // 如果文件夹名叫 "置顶" 或 "Top" 或 "Star"，自动归类为 "置顶"
+                    if (["置顶", "Top", "Star", "Favorites", "收藏"].includes(folderName)) {
+                        currentFolder = "置顶";
+                    } else {
+                        currentFolder = folderName;
+                    }
                 } else if (a) {
-                    // 发现链接
                     const url = a.getAttribute('href');
                     const name = a.textContent.trim() || "未命名";
                     
@@ -618,15 +674,14 @@
 
             if (count > 0) {
                 saveSites();
-                statusDiv.innerHTML = `<span style="color:#166534">✅ 成功导入 <b>${count}</b> 个网址 (跳过 ${skip} 个重复)，自动识别了分类。</span>`;
-                // 自动切换到"全部"查看新导入的内容
+                statusDiv.innerHTML = `<span style="color:#166534">✅ 成功导入 <b>${count}</b> 个网址 (跳过 ${skip} 个重复)。</span>`;
                 if(currentCategory !== "全部") {
                     currentCategory = "全部";
                     renderTabs();
                     renderSites();
                 }
             } else {
-                statusDiv.innerHTML = `<span style="color:#ef4444">未找到新网址或文件格式不正确。</span>`;
+                statusDiv.innerHTML = `<span style="color:#ef4444">未找到新网址。</span>`;
             }
             input.value = ''; 
         };
