@@ -138,8 +138,8 @@ $('.Select-box-2 li').click(function () {
 		_tihs = 'https://weixin.sogou.com/weixin';
 		_name = 'query';
 	} else if (_tihs == 'pan_s') {
-		_tihs = 'https://pan.baidu.com/disk/home';
-		_name = 'search';
+		_tihs = 'https://soali.net/search';
+		_name = 'keyword';
 	}else if (_tihs == 'bing_s') {
 		_tihs = 'https://www.bing.com/search';
 		_name = 'q';
