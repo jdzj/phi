@@ -151,11 +151,12 @@
 <!-- 底部版权start -->
 </div>
 <div class="footer"> 
-	<a href="//0.618033.com/" style="color:#8C8C8C;" target="_blank"> &copy; 2020-<?php echo date("Y"); ?> Maintained by Phi</a></p>
+	<a href="//0.618033.com/" style="color:#8C8C8C;" target="_blank"> &copy; 2020-<span id="currentYearMonth"></span> Maintained by Phi</a></p>
 </div>
 <!-- 底部版权end -->
 </div>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/js.js"></script>
+<script>const now = new Date();const year = now.getFullYear();const month = String(now.getMonth() + 1).padStart(2, '0');document.getElementById("currentYearMonth").textContent = `${year}.${month}`;</script>
 </body>
 </html>
