@@ -14,6 +14,21 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<link rel="stylesheet" type="text/css" href="css/yidong.css" />
 	<script>document.addEventListener('visibilitychange',function(){if(document.visibilityState=='hidden'){normal_title=document.title;document.title='1.618033';}else{document.title=normal_title;}});</script>
+	<style>
+		.time-display {
+			text-align: center;
+			padding: 10px;
+			color: #8C8C8C;
+			font-size: 14px;
+			margin-top: 10px;
+		}
+		.current-time {
+			font-weight: bold;
+			font-size: 16px;
+			color: #FFFFFF;
+			margin-bottom: 5px;
+		}
+	</style>
 </head>
 
 <body> 
@@ -42,6 +57,12 @@
 		<ul class="keylist"></ul>
 	</div>
 	<!-- 搜索栏end -->
+
+	<!-- 时间显示start -->
+	<div class="time-display">
+		<div class="current-time" id="current-time">加载中...</div>
+	</div>
+	<!-- 时间显示end -->
 
 	<!-- 内容start -->
 <div class="body">
@@ -157,6 +178,33 @@
 </div>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/js.js"></script>
-<script>const now = new Date();const year = now.getFullYear();const month = String(now.getMonth() + 1).padStart(2, '0');document.getElementById("currentYearMonth").textContent = `${year}.${month}`;</script>
+<script>
+// 更新年月信息
+const now = new Date();
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, '0');
+document.getElementById("currentYearMonth").textContent = `${year}.${month}`;
+
+// 更新毫秒级时间显示
+function updateCurrentTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+    
+    const timeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+    document.getElementById("current-time").textContent = timeString;
+}
+
+// 初始调用一次
+updateCurrentTime();
+
+// 每100毫秒更新一次时间（为了显示毫秒变化）
+setInterval(updateCurrentTime, 100);
+</script>
 </body>
 </html>
