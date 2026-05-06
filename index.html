@@ -215,7 +215,7 @@ function updateCurrentTime() {
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
     
-    const timeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+    const timeString = `${year}.${month}.${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
     document.getElementById("current-time").textContent = timeString;
 }
 
