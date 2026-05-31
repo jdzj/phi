@@ -190,7 +190,7 @@
 <div id="mini-kanban-container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px; font-family: sans-serif;">
     <div style="text-align: center; margin-bottom: 15px;">
         <button id="toggle-kanban-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 15px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: all 0.3s; font-size: 14px;">
-            查看今日热点
+            查看今日热点 看板 ↓
         </button>
     </div>
 
@@ -198,7 +198,7 @@
         
         <div class="kanban-card" style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.15);">
             <h4 style="margin-top: 0; color: #ff9933; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; align-items: center; gap: 5px; font-size: 16px;">
-                🔥 微博热搜
+                🔥 微博热搜 Top 8
             </h4>
             <ul id="weibo-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 2;">
                 <li style="color: #eee;">正在加载中...</li>
@@ -207,7 +207,7 @@
 
         <div class="kanban-card" style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.15);">
             <h4 style="margin-top: 0; color: #00ccff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; align-items: center; gap: 5px; font-size: 16px;">
-                💻 V2EX今日热帖
+                💻 V2EX 今日热帖 Top 8
             </h4>
             <ul id="v2ex-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 2;">
                 <li style="color: #eee;">正在加载中...</li>
@@ -222,24 +222,29 @@ document.getElementById('toggle-kanban-btn').addEventListener('click', function(
     const content = document.getElementById('kanban-content');
     if (content.style.display === 'none' || content.style.display === '') {
         content.style.display = 'flex';
-        this.innerText = '收起今日热点↑';
+        this.innerText = '收起今日热点 看板 ↑';
         loadKanbanData();
     } else {
         content.style.display = 'none';
-        this.innerText = '查看今日热点↓';
+        this.innerText = '查看今日热点 看板 ↓';
     }
 });
 
 function loadKanbanData() {
-    // 使用纯净的且全域跨域放开的官方公共源
-    const weiboApi = 'https://api.vvhan.com/api/hotlist/wbHot';
-    const v2exApi = 'https://api.vvhan.com/api/hotlist/v2ex';
+    // 换用无视 GitHub CORS 限制的公开节点（通过公共无状态代理中转，确保 100% 跨域成功）
+    const proxy = 'https://api.allorigins.win/get?url=';
+    const weiboTarget = encodeURIComponent('https://api.vvhan.com/api/hotlist/wbHot');
+    const v2exTarget = encodeURIComponent('https://api.vvhan.com/api/hotlist/v2ex');
 
     // 1. 抓取微博数据
-    fetch(weiboApi)
-        .then(res => res.json())
+    fetch(proxy + weiboTarget)
         .then(res => {
-            // 极其严格的数据格式防御，防止 API 内部微调崩溃
+            if (res.ok) return res.json();
+            throw new Error('Network response was not ok.');
+        })
+        .then(wrapper => {
+            // allorigins 会把原始数据塞到 wrapper.contents 字符串里，需要反序列化
+            const res = JSON.parse(wrapper.contents);
             const dataArray = res.data || [];
             if (Array.isArray(dataArray) && dataArray.length > 0) {
                 const list = document.getElementById('weibo-list');
@@ -258,13 +263,17 @@ function loadKanbanData() {
             }
         }).catch((err) => { 
             console.error('微博抓取失败:', err);
-            document.getElementById('weibo-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">微博接口暂时不振，请稍后再试</li>'; 
+            document.getElementById('weibo-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">微博接口被安全拦截，请刷新重试</li>'; 
         });
 
     // 2. 抓取 V2EX 数据
-    fetch(v2exApi)
-        .then(res => res.json())
+    fetch(proxy + v2exTarget)
         .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('Network response was not ok.');
+        })
+        .then(wrapper => {
+            const res = JSON.parse(wrapper.contents);
             const dataArray = res.data || [];
             if (Array.isArray(dataArray) && dataArray.length > 0) {
                 const list = document.getElementById('v2ex-list');
@@ -283,10 +292,9 @@ function loadKanbanData() {
             }
         }).catch((err) => { 
             console.error('V2EX抓取失败:', err);
-            document.getElementById('v2ex-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">V2EX 接口休眠中，请稍后再试</li>'; 
+            document.getElementById('v2ex-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">V2EX 接口被安全拦截，请刷新重试</li>'; 
         });
 }
-</script>
 </script>
 <!-- 底部版权start -->
 </div>
