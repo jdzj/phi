@@ -231,26 +231,20 @@ document.getElementById('toggle-kanban-btn').addEventListener('click', function(
 });
 
 function loadKanbanData() {
-    // 换用无视 GitHub CORS 限制的公开节点（通过公共无状态代理中转，确保 100% 跨域成功）
-    const proxy = 'https://api.allorigins.win/get?url=';
-    const weiboTarget = encodeURIComponent('https://api.vvhan.com/api/hotlist/wbHot');
-    const v2exTarget = encodeURIComponent('https://api.vvhan.com/api/hotlist/v2ex');
+    // 换用无视跨域限制、全球高可用的公共直连 API 源
+    const weiboApi = 'https://api.buxiangyao.link/news/weibo'; // 稳定放开 CORS 的开源同步源
+    const v2exApi = 'https://www.v2ex.com/api/topics/hot.json';  // V2EX 官方直连 API
 
     // 1. 抓取微博数据
-    fetch(proxy + weiboTarget)
+    fetch(weiboApi)
+        .then(res => res.json())
         .then(res => {
-            if (res.ok) return res.json();
-            throw new Error('Network response was not ok.');
-        })
-        .then(wrapper => {
-            // allorigins 会把原始数据塞到 wrapper.contents 字符串里，需要反序列化
-            const res = JSON.parse(wrapper.contents);
-            const dataArray = res.data || [];
+            const dataArray = res.data || res.items || res;
             if (Array.isArray(dataArray) && dataArray.length > 0) {
                 const list = document.getElementById('weibo-list');
                 list.innerHTML = '';
                 dataArray.slice(0, 8).forEach((item, index) => {
-                    const title = item.title || '未知标题';
+                    const title = item.title || item.keyword || '未知标题';
                     const url = item.url || `https://s.weibo.com/weibo?q=${encodeURIComponent(title)}`;
                     list.innerHTML += `
                         <li style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; text-align: left;">
@@ -259,22 +253,17 @@ function loadKanbanData() {
                         </li>`;
                 });
             } else {
-                throw new Error('格式不对');
+                throw new Error('Data Empty');
             }
         }).catch((err) => { 
-            console.error('微博抓取失败:', err);
-            document.getElementById('weibo-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">微博接口被安全拦截，请刷新重试</li>'; 
+            console.error(err);
+            document.getElementById('weibo-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">微博直连接口连接中，请稍后再试</li>'; 
         });
 
     // 2. 抓取 V2EX 数据
-    fetch(proxy + v2exTarget)
-        .then(res => {
-            if (res.ok) return res.json();
-            throw new Error('Network response was not ok.');
-        })
-        .then(wrapper => {
-            const res = JSON.parse(wrapper.contents);
-            const dataArray = res.data || [];
+    fetch(v2exApi)
+        .then(res => res.json())
+        .then(dataArray => {
             if (Array.isArray(dataArray) && dataArray.length > 0) {
                 const list = document.getElementById('v2ex-list');
                 list.innerHTML = '';
@@ -288,13 +277,14 @@ function loadKanbanData() {
                         </li>`;
                 });
             } else {
-                throw new Error('格式不对');
+                throw new Error('Data Empty');
             }
         }).catch((err) => { 
-            console.error('V2EX抓取失败:', err);
-            document.getElementById('v2ex-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">V2EX 接口被安全拦截，请刷新重试</li>'; 
+            console.error(err);
+            document.getElementById('v2ex-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">V2EX 直连接口连接中，请稍后再试</li>'; 
         });
 }
+</script>
 </script>
 <!-- 底部版权start -->
 </div>
