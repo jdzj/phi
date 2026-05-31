@@ -189,27 +189,27 @@
 <!-- 内容end -->
 <div id="mini-kanban-container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px; font-family: sans-serif;">
     <div style="text-align: center; margin-bottom: 15px;">
-        <button id="toggle-kanban-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 15px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: all 0.3s;">
-            查看今日热点 看板 ↓
+        <button id="toggle-kanban-btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 15px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: all 0.3s; font-size: 14px;">
+            查看今日热点 ↓
         </button>
     </div>
 
-    <div id="kanban-content" style="display: none; display: flex; gap: 20px; justify-content: space-between; flex-wrap: wrap;">
+    <div id="kanban-content" style="display: none; gap: 20px; justify-content: space-between; flex-wrap: wrap;">
         
         <div class="kanban-card" style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.15);">
-            <h4 style="margin-top: 0; color: #ff9933; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                🔥 微博热搜 Top 8
+            <h4 style="margin-top: 0; color: #ff9933; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; align-items: center; gap: 5px; font-size: 16px;">
+                🔥 微博热搜
             </h4>
-            <ul id="weibo-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+            <ul id="weibo-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 2;">
                 <li style="color: #eee;">正在加载中...</li>
             </ul>
         </div>
 
         <div class="kanban-card" style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.15);">
-            <h4 style="margin-top: 0; color: #00ccff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                💻 V2EX 今日热帖 Top 8
+            <h4 style="margin-top: 0; color: #00ccff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; align-items: center; gap: 5px; font-size: 16px;">
+                💻 V2EX热帖
             </h4>
-            <ul id="v2ex-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+            <ul id="v2ex-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 2;">
                 <li style="color: #eee;">正在加载中...</li>
             </ul>
         </div>
@@ -220,58 +220,71 @@
 <script>
 document.getElementById('toggle-kanban-btn').addEventListener('click', function() {
     const content = document.getElementById('kanban-content');
-    if (content.style.display === 'none' || content.style.style === '') {
+    if (content.style.display === 'none' || content.style.display === '') {
         content.style.display = 'flex';
-        this.innerText = '收起今日热点 看板 ↑';
-        // 展开时才触发数据加载，省流量
+        this.innerText = '收起今日热点↑';
         loadKanbanData();
     } else {
         content.style.display = 'none';
-        this.innerText = '查看今日热点 看板 ↓';
+        this.innerText = '查看今日热点↓';
     }
 });
 
 function loadKanbanData() {
-    // 采用公开免费的每日热榜 API 节点（免 Key，支持 CORS 跨域）
-    const weiboApi = 'https://api.vvhan.com/api/hotlist/wbHot';
-    const v2exApi = 'https://api.vvhan.com/api/hotlist/v2ex';
+    // 替换为更适合静态页调用的、全 HTTPS 支持的高可用聚合 API
+    const weiboApi = 'https://api.shadiao.pro/trending/weibo';
+    const v2exApi = 'https://api.shadiao.pro/trending/v2ex';
 
     // 1. 抓取微博数据
     fetch(weiboApi)
         .then(res => res.json())
-        .then(data => {
-            if (data.success && data.data) {
+        .then(res => {
+            // 兼容多层数据结构判断
+            const data = res.data || res.items || res;
+            if (Array.isArray(data)) {
                 const list = document.getElementById('weibo-list');
                 list.innerHTML = '';
-                // 仅截取前 8 条
-                data.data.slice(0, 8).forEach((item, index) => {
+                data.slice(0, 8).forEach((item, index) => {
+                    const title = item.title || item.titleText || '';
+                    const url = item.url || `https://s.weibo.com/weibo?q=${encodeURIComponent(title)}`;
                     list.innerHTML += `
-                        <li style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px;">
-                            <span style="color: #ff9933; font-weight: bold; margin-right: 5px;">${index + 1}.</span>
-                            <a href="${item.url}" target="_blank" style="color: #fff; text-decoration: none; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">${item.title}</a>
-                            <span style="color: #aaa; font-size: 11px; margin-left: 5px;">(${item.hot})</span>
+                        <li style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; text-align: left;">
+                            <span style="color: #ff9933; font-weight: bold; margin-right: 8px;">${index + 1}</span>
+                            <a href="${url}" target="_blank" style="color: #fff; text-decoration: none; opacity: 0.85; transition: opacity 0.2s;" onmouseover="this.style.opacity=1;this.style.textDecoration='underline'" onmouseout="this.style.opacity=0.85;this.style.textDecoration='none'">${title}</a>
                         </li>`;
                 });
+            } else {
+                throw new Error('Data format error');
             }
-        }).catch(() => { document.getElementById('weibo-list').innerHTML = '<li style="color:#ff6666;">加载失败，请稍后再试</li>'; });
+        }).catch((err) => { 
+            console.error(err);
+            document.getElementById('weibo-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">微博接口暂时不振，请稍后再试</li>'; 
+        });
 
     // 2. 抓取 V2EX 数据
     fetch(v2exApi)
         .then(res => res.json())
-        .then(data => {
-            if (data.success && data.data) {
+        .then(res => {
+            const data = res.data || res.items || res;
+            if (Array.isArray(data)) {
                 const list = document.getElementById('v2ex-list');
                 list.innerHTML = '';
-                // 仅截取前 8 条
-                data.data.slice(0, 8).forEach((item, index) => {
+                data.slice(0, 8).forEach((item, index) => {
+                    const title = item.title || '';
+                    const url = item.url || '#';
                     list.innerHTML += `
-                        <li style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px;">
-                            <span style="color: #00ccff; font-weight: bold; margin-right: 5px;">${index + 1}.</span>
-                            <a href="${item.url}" target="_blank" style="color: #fff; text-decoration: none; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">${item.title}</a>
+                        <li style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; text-align: left;">
+                            <span style="color: #00ccff; font-weight: bold; margin-right: 8px;">${index + 1}</span>
+                            <a href="${url}" target="_blank" style="color: #fff; text-decoration: none; opacity: 0.85; transition: opacity 0.2s;" onmouseover="this.style.opacity=1;this.style.textDecoration='underline'" onmouseout="this.style.opacity=0.85;this.style.textDecoration='none'">${title}</a>
                         </li>`;
                 });
+            } else {
+                throw new Error('Data format error');
             }
-        }).catch(() => { document.getElementById('v2ex-list').innerHTML = '<li style="color:#ff6666;">加载失败，请稍后再试</li>'; });
+        }).catch((err) => { 
+            console.error(err);
+            document.getElementById('v2ex-list').innerHTML = '<li style="color:#ff6666;font-size:12px;">V2EX 接口休眠中，请稍后再试</li>'; 
+        });
 }
 </script>
 <!-- 底部版权start -->
